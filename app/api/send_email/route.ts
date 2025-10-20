@@ -60,6 +60,9 @@ async function sendEmail(toEmail: string, subject: string, htmlBody: string): Pr
 }
 
 export async function POST(request: Request) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
+
     try {
         // Check Gmail credentials
         if (!GMAIL_USERNAME || !GMAIL_APP_PASSWORD) {
@@ -257,8 +260,16 @@ export async function POST(request: Request) {
 
         await sendEmail(MANAGER_EMAIL, "Нове замовлення отримано", managerMessage);
 
+        clearTimeout(timeoutId);
         return NextResponse.json({ message: "Замовлення оброблено, електронні листи надіслано" }, { status: 200 });
     } catch (error) {
+        clearTimeout(timeoutId);
+        if (error instanceof Error && error.name === 'AbortError') {
+            return NextResponse.json(
+                { error: 'Request timeout' },
+                { status: 408 }
+            );
+        }
         console.error("Error sending email:", error);
         return NextResponse.json({ 
             error: "Failed to send email", 

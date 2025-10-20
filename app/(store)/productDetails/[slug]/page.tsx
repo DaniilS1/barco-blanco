@@ -6,8 +6,16 @@ import { client } from "@/sanity/lib/client";
 
 // Function to fetch product data from Sanity using the slug.
 async function getProduct(slug: string) {
- 
-  return await client.fetch(productDetailsQuery, { slug });
+  try {
+    return await client.fetch(
+      productDetailsQuery,
+      { slug },
+      { next: { revalidate: 600 } }
+    );
+  } catch (error) {
+    console.error('Failed to fetch product:', error);
+    return null;
+  }
 }
 
 // Define the page props so that params is a Promise (Workaround 1)

@@ -15,24 +15,31 @@ import CallButton from "../../components/ui/CallButton";
 import BannerCarousel from "../../components/ui/HeroBanner";
 
 const Home = async () => {
-  const bannerData = await client.fetch(bannerQuery);
-  const productsData = await client.fetch(productQuery);
+  try {
+    const [bannerData, productsData] = await Promise.all([
+      client.fetch(bannerQuery).catch(() => []),
+      client.fetch(productQuery).catch(() => [])
+    ]);
 
-  return (
-    <>
+    return (
+      <>
 
-      {/* Swiper Banner Carousel: pass the "images" array */}
-      {bannerData?.[0]?.images?.length > 0 && (
-        <BannerCarousel images={bannerData[0].images} />
-      )}
+        {/* Swiper Banner Carousel: pass the "images" array */}
+        {bannerData?.[0]?.images?.length > 0 && (
+          <BannerCarousel images={bannerData[0].images} />
+        )}
 
-      <Categories />
-      <PopularProducts productsData={productsData} />
-      <Features />
-      <CallButton />
-      <AboutSection />
-    </>
-  );
+        <Categories />
+        <PopularProducts productsData={productsData} />
+        <Features />
+        <CallButton />
+        <AboutSection />
+      </>
+    );
+  } catch (error) {
+    console.error('Failed to fetch data:', error);
+    return <div>Unable to load content</div>;
+  }
 };
 
 export default Home;
