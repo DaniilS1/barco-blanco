@@ -1,39 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Barco Blanco Store
 
-## Getting Started
+Ein moderner E-Commerce Store für Badezimmermöbel, gebaut mit Next.js 15, Sanity CMS und Tailwind CSS.
 
-First, run the development server:
+## 🚀 Features
+
+- **Moderne UI/UX** mit Tailwind CSS und Shadcn UI
+- **Headless CMS** mit Sanity für Content-Management
+- **Responsive Design** für alle Geräte
+- **E-Commerce Funktionalität** mit Warenkorb und Bestellabwicklung
+- **SEO-optimiert** mit Next.js App Router
+- **Performance-optimiert** mit Caching und Code-Splitting
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS, Shadcn UI, Radix UI
+- **CMS**: Sanity
+- **Deployment**: Vercel
+- **Animation**: Framer Motion
+
+## 🚀 Getting Started
 
 ```bash
+# Dependencies installieren
+npm install
+
+# Development Server starten
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build für Produktion
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Öffne [http://localhost:3000](http://localhost:3000) im Browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📦 Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` - Development Server
+- `npm run build` - Production Build
+- `npm run start` - Production Server
+- `npm run lint` - ESLint Check
+- `npm run test` - Jest Tests
 
-## Learn More
+## 🌐 Deployment
 
-To learn more about Next.js, take a look at the following resources:
+Das Projekt ist für Vercel optimiert und kann einfach deployed werden:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/barco-blanco-store)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📝 License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT License - siehe [LICENSE](LICENSE) für Details.
 
 
 
