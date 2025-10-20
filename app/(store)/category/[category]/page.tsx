@@ -17,8 +17,10 @@ export default async function CategoryPage({
   // Use searchParams in a no-op way to mark it as “used.”
   void await searchParams;
 
-  // Fetch products for the selected category from Sanity.
-  const products = await client.fetch(categoryProductQuery(category));
+  // Fetch products for the selected category from Sanity with caching.
+  const products = await client.fetch(categoryProductQuery(category), {}, {
+    next: { revalidate: 60 } // Cache for 60 seconds
+  });
 
   return <ProductsClient products={products} selectedCategory={category} />;
 }

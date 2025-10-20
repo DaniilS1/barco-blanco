@@ -144,7 +144,7 @@ export async function POST(request: Request) {
   <p style="font-size: 16px; color: #555; margin-top: 30px;">
     Наш менеджер зв’яжеться з вами якнайшвидше для підтвердження та обробки замовлення.<br>
     Якщо питання термінове — зателефонуйте нам: 
-    <a href="tel:+380666924322" style="color: #3498db; text-decoration: none;">+38 (066) 69-24-322</a>.
+    <a href="tel:+380666924322" style="color: #3498db; text-decoration: none;">+38 (050) 47-30-644</a>.
   </p>
 </div>
 `;

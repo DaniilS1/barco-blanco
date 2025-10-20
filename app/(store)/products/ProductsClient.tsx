@@ -7,7 +7,6 @@ import { Pagination } from "../../../components/ui/pagination";
 import Product from "../../../components/ui/Product";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
-import { useScrollToTop } from "@/hook/useScrollToTop";
 import Image from "next/image";
 
 interface ProductType {
@@ -44,7 +43,6 @@ export default function ProductsClient({
   products,
   selectedCategory,
 }: ProductsClientProps) {
-  useScrollToTop();
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 16;
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;

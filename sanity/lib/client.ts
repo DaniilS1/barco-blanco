@@ -11,6 +11,8 @@ export const client = createClient({
   dataset,
   apiVersion,
   useCdn: true, // Set to false if statically generating pages, using ISR or tag-based revalidation
+  perspective: 'published', // Only fetch published content
+  stega: false, // Disable visual editing features for better performance
 });
 
 const builder = imageUrlBuilder(client); // Use 'client' here instead of 'sanityClient'
