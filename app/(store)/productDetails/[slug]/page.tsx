@@ -1,8 +1,8 @@
 // app/(store)/productDetails/[slug]/page.tsx
 
 import { productDetailsQuery } from "@/sanity/lib/queries/productDetailsQuery";
-import ProductDetails from "../../../../components/ui/ProductDetails";
-import { client } from "../../../../sanity/lib/client";
+import ProductDetails from "@/components/ui/ProductDetails";
+import { client } from "@/sanity/lib/client";
 
 // Function to fetch product data from Sanity using the slug.
 async function getProduct(slug: string) {
