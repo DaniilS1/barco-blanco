@@ -26,18 +26,18 @@ interface ProductsClientProps {
 }
 
 const categoryWidthFilters: { [key: string]: number[] } = {
-  mirrors: [45, 50, 55, 60, 65, 70, 80, 90],
-  cabinet: [40, 45, 50, 55, 60, 65, 70, 75, 80, 90, 100],
-  wardrobe: [40, 50, 60],
-  dressers: [30, 35, 40],
+  dzerkala: [45, 50, 55, 60, 65, 70, 80, 90],
+  tumby: [40, 45, 50, 55, 60, 65, 70, 75, 80, 90, 100],
+  shafy: [40, 50, 60],
+  penaly: [30, 35, 40],
 };
 
 const categoryLabels: Record<string, string> = {
-  mirrors: "Дзеркала",
-  cabinet: "Тумби",
-  wardrobe: "Нависні шафи",
-  waterproof: "WATER",
-  dressers: "Пенали",
+  dzerkala: "Дзеркала",
+  tumby: "Тумби",
+  shafy: "Нависні шафи",
+  vologostiike: "WATER",
+  penaly: "Пенали",
 };
 
 export default function ProductsClient({
@@ -54,19 +54,25 @@ export default function ProductsClient({
   const [showMobileFilter, setShowMobileFilter] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const { addToCart } = useCart();
-  const allCategories = ["mirrors", "cabinet", "dressers", "wardrobe", "waterproof"];
+  const allCategories = [
+    "dzerkala",
+    "tumby",
+    "penaly",
+    "shafy",
+    "vologostiike",
+  ];
 
   const categoryProducts = selectedCategory
     ? products.filter(
-      (p) => p.category?.toLowerCase() === selectedCategory.toLowerCase()
-    )
+        (p) => p.category?.toLowerCase() === selectedCategory.toLowerCase()
+      )
     : products;
 
   const availableWidths = selectedCategory
     ? categoryWidthFilters[selectedCategory.toLowerCase()] || []
     : Array.from(new Set(Object.values(categoryWidthFilters).flat())).sort(
-      (a, b) => a - b
-    );
+        (a, b) => a - b
+      );
 
   useEffect(() => {
     setSelectedWidths([]);
@@ -114,7 +120,7 @@ export default function ProductsClient({
     <>
       {/* Мобильное меню для фильтра и категорий */}
       <div className="md:hidden bg-100 flex flex-wrap justify-center w-full px-4 mb-4 mt-4 gap-6">
-        {selectedCategory !== "waterproof" && (
+        {selectedCategory !== "vologostiike" && (
           <button
             onClick={() => setShowMobileFilter(true)}
             className="flex-1 min-w-[150px] flex items-center justify-center gap-2 px-4 py-3 bg-[#4FA7B9] hover:bg-[#1996A3] text-white rounded-lg transition"
@@ -140,15 +146,21 @@ export default function ProductsClient({
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
           {showCategories && (
             <div className="absolute top-full mt-1 w-full bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 z-10">
               <Link
                 href="/products"
-                className={`block px-4 py-2 text-sm text-gray-700 hover:bg-[#1996A3] hover:text-white transition ${!selectedCategory ? "bg-[#1996A3] text-white" : ""
-                  }`}
+                className={`block px-4 py-2 text-sm text-gray-700 hover:bg-[#1996A3] hover:text-white transition ${
+                  !selectedCategory ? "bg-[#1996A3] text-white" : ""
+                }`}
               >
                 Усі товари
               </Link>
@@ -156,8 +168,9 @@ export default function ProductsClient({
                 <Link
                   key={category}
                   href={`/category/${category}`}
-                  className={`block px-4 py-2 text-sm text-gray-700 hover:bg-[#1996A3] hover:text-white transition ${isActive(category) ? "bg-[#1996A3] text-white" : ""
-                    }`}
+                  className={`block px-4 py-2 text-sm text-gray-700 hover:bg-[#1996A3] hover:text-white transition ${
+                    isActive(category) ? "bg-[#1996A3] text-white" : ""
+                  }`}
                 >
                   {categoryLabels[category] || category}
                 </Link>
@@ -168,37 +181,47 @@ export default function ProductsClient({
       </div>
 
       {/* Мобильный фильтр (выезжающая панель) */}
-      {showMobileFilter && selectedCategory !== "waterproof" && (
+      {showMobileFilter && selectedCategory !== "vologostiike" && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end">
           <div className="w-[90%] max-w-xs bg-white h-full p-5 shadow-lg flex flex-col">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-medium text-[#1996A3]">Фільтри</h2>
-              <button onClick={() => setShowMobileFilter(false)} className="text-2xl">
+              <button
+                onClick={() => setShowMobileFilter(false)}
+                className="text-2xl"
+              >
                 &times;
               </button>
             </div>
-            {availableWidths.length > 0 && selectedCategory !== "waterproof" && (
-              <>
-                <h3 className="font-medium mb-2">Ширина</h3>
-                <div className="flex flex-col space-y-2 mb-4">
-                  {availableWidths.map((width) => (
-                    <label key={width} className="flex items-center space-x-2 text-sm cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={selectedWidths.includes(width)}
-                        onChange={() => toggleWidth(width)}
-                        className="peer hidden"
-                      />
-                      <span className="w-4 h-4 border-2 border-[#1996A3] rounded flex items-center justify-center transition hover:bg-[#1996A3] hover:text-white peer-checked:bg-[#1996A3] peer-checked:text-white">
-                        <span className="w-2 h-2 bg-white opacity-0 peer-checked:opacity-100 transition-opacity rounded-sm" />
-                      </span>
-                      <span>{width} см</span>
-                    </label>
-                  ))}
-                </div>
-              </>
-            )}
-            <button onClick={handleClearFilters} className="text-sm text-[#1996A3] underline">
+            {availableWidths.length > 0 &&
+              selectedCategory !== "vologostiike" && (
+                <>
+                  <h3 className="font-medium mb-2">Ширина</h3>
+                  <div className="flex flex-col space-y-2 mb-4">
+                    {availableWidths.map((width) => (
+                      <label
+                        key={width}
+                        className="flex items-center space-x-2 text-sm cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedWidths.includes(width)}
+                          onChange={() => toggleWidth(width)}
+                          className="peer hidden"
+                        />
+                        <span className="w-4 h-4 border-2 border-[#1996A3] rounded flex items-center justify-center transition hover:bg-[#1996A3] hover:text-white peer-checked:bg-[#1996A3] peer-checked:text-white">
+                          <span className="w-2 h-2 bg-white opacity-0 peer-checked:opacity-100 transition-opacity rounded-sm" />
+                        </span>
+                        <span>{width} см</span>
+                      </label>
+                    ))}
+                  </div>
+                </>
+              )}
+            <button
+              onClick={handleClearFilters}
+              className="text-sm text-[#1996A3] underline"
+            >
               Очистити
             </button>
             <button
@@ -215,10 +238,11 @@ export default function ProductsClient({
       <div className="hidden md:flex flex-wrap gap-2 mb-6 mt-6 justify-center">
         <Link href="/products">
           <button
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition border border-[#1996A3] ${!selectedCategory
-              ? "bg-[#1996A3] text-white"
-              : "bg-white text-[#1996A3] hover:bg-[#1996A3] hover:text-white"
-              }`}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition border border-[#1996A3] ${
+              !selectedCategory
+                ? "bg-[#1996A3] text-white"
+                : "bg-white text-[#1996A3] hover:bg-[#1996A3] hover:text-white"
+            }`}
           >
             Усі товари
           </button>
@@ -226,10 +250,11 @@ export default function ProductsClient({
         {allCategories.map((category) => (
           <Link key={category} href={`/category/${category}`}>
             <button
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition border border-[#1996A3] ${isActive(category)
-                ? "bg-[#1996A3] text-white"
-                : "bg-white text-[#1996A3] hover:bg-[#1996A3] hover:text-white"
-                }`}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition border border-[#1996A3] ${
+                isActive(category)
+                  ? "bg-[#1996A3] text-white"
+                  : "bg-white text-[#1996A3] hover:bg-[#1996A3] hover:text-white"
+              }`}
             >
               {categoryLabels[category] || category}
             </button>
@@ -240,8 +265,8 @@ export default function ProductsClient({
       {/* Основная часть */}
       <div className="w-full bg-gray-50 py-4 px-2">
         <div className="max-w-[1400px] mx-auto px-4">
-          {/* Если категория waterproof, выводим описание на всю ширину с центрированием текста */}
-          {selectedCategory === "waterproof" && (
+          {/* Если категория vologostiike, выводим описание на всю ширину с центрированием текста */}
+          {selectedCategory === "vologostiike" && (
             <div className="w-full mb-6">
               <div className=" border-[#1996A3] rounded-xl p-6 shadow-md text-sm sm:text-base leading-relaxed text-center">
                 <div className="flex flex-col gap-4">
@@ -250,8 +275,10 @@ export default function ProductsClient({
                   </h2>
                   <p>
                     Ця тумба зроблена{" "}
-                    <span className="font-semibold text-[#1996A3]">водостійкою</span>!
-                    Корпус і фасади виготовлені зі спеціального МДФ, поверхня
+                    <span className="font-semibold text-[#1996A3]">
+                      водостійкою
+                    </span>
+                    ! Корпус і фасади виготовлені зі спеціального МДФ, поверхня
                     ламінована водонепроникним матеріалом, а крайка приклеєна
                     поліуретановим клеєм, який не боїться води.
                   </p>
@@ -261,18 +288,23 @@ export default function ProductsClient({
                       нержавіючої сталі з дотягом
                     </span>{" "}
                     забезпечують плавне закриття. Ніжки —{" "}
-                    <span className="font-medium text-[#1996A3]">алюмінієві</span>, фурнітура
-                    кріпиться нержавіючими саморізами.
+                    <span className="font-medium text-[#1996A3]">
+                      алюмінієві
+                    </span>
+                    , фурнітура кріпиться нержавіючими саморізами.
                   </p>
                   <p>
-                    Всі матеріали та метод складання роблять тумбу стійкою не лише до
-                    вологості, але й до{" "}
+                    Всі матеріали та метод складання роблять тумбу стійкою не
+                    лише до вологості, але й до{" "}
                     <span className="font-semibold text-[#1996A3]">
                       прямих потраплянь води
-                    </span>, наприклад, при аварії змішувача чи сифона — зовні та всередині!
+                    </span>
+                    , наприклад, при аварії змішувача чи сифона — зовні та
+                    всередині!
                   </p>
                   <p className="mt-4 font-semibold italic text-[#1996A3]">
-                    Тумба Water — це справжня <span>яхта у вашій ванній кімнаті</span>!
+                    Тумба Water — це справжня{" "}
+                    <span>яхта у вашій ванній кімнаті</span>!
                   </p>
                 </div>
               </div>
@@ -281,11 +313,13 @@ export default function ProductsClient({
 
           {/* Блок с фильтрами и товарами */}
           <div className="flex flex-col md:flex-row gap-4">
-            {selectedCategory !== "waterproof" && (
+            {selectedCategory !== "vologostiike" && (
               <div className="hidden md:block w-fit bg-white border border-gray-200 rounded-lg p-4 h-min">
                 {availableWidths.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="font-medium text-sm text-[#1996A3] mb-2">Ширина</h3>
+                    <h3 className="font-medium text-sm text-[#1996A3] mb-2">
+                      Ширина
+                    </h3>
                     <div className="flex flex-col space-y-2">
                       {availableWidths.map((width) => (
                         <label
@@ -307,12 +341,14 @@ export default function ProductsClient({
                     </div>
                   </div>
                 )}
-                <button onClick={handleClearFilters} className="text-sm text-[#1996A3] underline">
+                <button
+                  onClick={handleClearFilters}
+                  className="text-sm text-[#1996A3] underline"
+                >
                   Очистити
                 </button>
               </div>
             )}
-
 
             {/* Список товаров */}
             <div className="flex-1">
@@ -339,7 +375,12 @@ export default function ProductsClient({
                             onClick={() => handleAddToCart(product)}
                             className="bg-[#4FA7B9] hover:bg-[#1996A3] text-white px-3 py-2 rounded-md transition flex items-center justify-center"
                           >
-                            <Image src="/icons/cart.png" alt="Cart" width={20} height={20} />
+                            <Image
+                              src="/icons/cart.png"
+                              alt="Cart"
+                              width={20}
+                              height={20}
+                            />
                           </Button>
                         </div>
                       </motion.div>
@@ -355,7 +396,9 @@ export default function ProductsClient({
               </div>
               <div className="w-full mt-6 flex justify-center">
                 <Pagination
-                  totalPages={Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)}
+                  totalPages={Math.ceil(
+                    filteredProducts.length / ITEMS_PER_PAGE
+                  )}
                   currentPage={currentPage}
                   onPageChange={(page) => {
                     setCurrentPage(page);
@@ -385,44 +428,3 @@ export default function ProductsClient({
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

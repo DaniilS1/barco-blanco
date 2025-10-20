@@ -2,18 +2,12 @@
 
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCart } from "@/context/CartContext";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
 
 interface ProductImage {
   asset: { url: string };
@@ -82,12 +76,6 @@ export default function ProductDetails({ productData }: ProductDetailsProps) {
 
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
-  const [swiperReady, setSwiperReady] = useState(false);
-  const [swiperInstance, setSwiperInstance] = useState<any>(null);
-
-  useEffect(() => {
-    setSwiperReady(true);
-  }, []);
 
   // Handle navigation
   const goToPrevious = () => {
@@ -107,12 +95,6 @@ export default function ProductDetails({ productData }: ProductDetailsProps) {
   };
 
 
-  // Generate width options based on the product width
-  const widthOptions = width ? [
-    { value: `${width}`, label: `Ширина ${width} см` },
-    { value: `${width + 10}`, label: `Ширина ${width + 10} см` },
-    { value: `${width + 20}`, label: `Ширина ${width + 20} см` },
-  ] : [{ value: "50", label: "Ширина 50 см" }];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 md:py-8">

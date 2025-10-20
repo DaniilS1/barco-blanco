@@ -1,4 +1,3 @@
-//components/ui/Navbar.tsx
 "use client";
 
 import Link from "next/link";
@@ -19,11 +18,10 @@ import {
   Divider,
   useMediaQuery,
   Paper,
-  SwipeableDrawer,
+  SwipeableDrawer, // <-- SwipeableDrawer instead of Drawer
 } from "@mui/material";
 
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
@@ -97,7 +95,6 @@ const HoverLink = styled(Typography)({
 
 const BurgerMenuHeader = styled("div")({
   display: "flex",
-  justifyContent: "space-between",
   alignItems: "center",
   padding: "16px",
   backgroundColor: "#f5f5f5",
@@ -119,7 +116,6 @@ const Navbar: FC = () => {
     { name: string; slug: string }[]
   >([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [hideLogo, setHideLogo] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -127,7 +123,6 @@ const Navbar: FC = () => {
 
   const isMobile = useMediaQuery("(max-width: 600px)");
   const isVeryNarrow = useMediaQuery("(max-width: 468px)");
-const isNarrowScreen = useMediaQuery("(max-width:475px)");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -210,27 +205,20 @@ const isNarrowScreen = useMediaQuery("(max-width:475px)");
       <SwipeableDrawer
         anchor="left"
         open={drawerOpen}
-        disableSwipeToOpen
-        onOpen={() => {}}
+        onOpen={() => setDrawerOpen(true)}
         onClose={() => setDrawerOpen(false)}
       >
         <BurgerMenuContainer>
-          <BurgerMenuHeader>
-            <Link href="/">
+          <Link href="/">
+            <BurgerMenuHeader>
               <Box
                 component="img"
                 src="/icons/logo.svg"
                 alt="logo"
                 sx={{ width: 150, height: 50 }}
               />
-            </Link>
-            <IconButton
-              onClick={() => setDrawerOpen(false)}
-              sx={{ color: "#1996a3" }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </BurgerMenuHeader>
+            </BurgerMenuHeader>
+          </Link>
           <Divider />
           <List>
             <ListItem disablePadding>
@@ -250,11 +238,11 @@ const isNarrowScreen = useMediaQuery("(max-width:475px)");
               </ListItemButton>
             </ListItem>
             {[
-             { text: "Дзеркала", href: "/category/mirrors" },
-              { text: "Тумби", href: "/category/cabinet" },
-              { text: "Пенали", href: "/category/dressers" },
-              { text: "Нависні шафи", href: "/category/wardrobe" },
-              { text: "Водонепроникні", href: "/category/waterproof" },
+              { text: "Дзеркала", href: "/category/dzerkala" },
+              { text: "Тумби", href: "/category/tumby" },
+              { text: "Пенали", href: "/category/penaly" },
+              { text: "Нависні шафи", href: "/category/shafy" },
+              { text: "Водонепроникні", href: "/category/vologostiike" },
             ].map((item) => (
               <ListItem key={item.href} disablePadding>
                 <ListItemButton
@@ -326,8 +314,15 @@ const isNarrowScreen = useMediaQuery("(max-width:475px)");
             justifyContent: "space-between",
             alignItems: "center",
             flexWrap: "nowrap",
-            gap: { xs: 1, sm: 2, md: 4 },
-            px: { xs: 1, sm: 2 },
+            gap: {
+              xs: 1,
+              sm: 2,
+              md: 4,
+            },
+            px: {
+              xs: 1,
+              sm: 2,
+            },
           }}
         >
           {/* Left Section: Menu Icon + Logo */}
@@ -335,7 +330,10 @@ const isNarrowScreen = useMediaQuery("(max-width:475px)");
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: { xs: 1, sm: 2 },
+              gap: {
+                xs: 1,
+                sm: 2,
+              },
             }}
           >
             <IconButton
@@ -344,21 +342,24 @@ const isNarrowScreen = useMediaQuery("(max-width:475px)");
             >
               <MenuOutlinedIcon
                 sx={{
-                  fontSize: { xs: "1.8rem", sm: "2rem" },
+                  fontSize: {
+                    xs: "1.8rem",
+                    sm: "2rem",
+                  },
                 }}
               />
             </IconButton>
-            {/* Conditionally render logo based on hideLogo state */}
-            {!hideLogo && (
-              <Link href="/">
-                <Box
-                  component="img"
-                  src="/icons/logo.svg"
-                  alt="Logo"
-                  sx={{ height: 40, cursor: "pointer" }}
-                />
-              </Link>
-            )}
+            <Link href="/">
+              <Box
+                component="img"
+                src="/icons/logo.svg"
+                alt="Logo"
+                sx={{
+                  height: 40,
+                  cursor: "pointer",
+                }}
+              />
+            </Link>
           </Box>
 
           {/* Search Bar */}
@@ -367,7 +368,10 @@ const isNarrowScreen = useMediaQuery("(max-width:475px)");
               <SearchIconWrapper>
                 <SearchIcon
                   sx={{
-                    fontSize: { xs: "1.3rem", sm: "1.rem" },
+                    fontSize: {
+                      xs: "1.3rem",
+                      sm: "1.rem",
+                    },
                   }}
                 />
               </SearchIconWrapper>
@@ -379,10 +383,8 @@ const isNarrowScreen = useMediaQuery("(max-width:475px)");
                   setSearchValue(e.target.value);
                   setShowSuggestions(true);
                 }}
-                onClick={() => { if (isNarrowScreen) setHideLogo(true); }}
-                onFocus={() => { if (isNarrowScreen) setHideLogo(true); }}
-                onBlur={() => { if (isNarrowScreen) setHideLogo(false); }}
                 onKeyDown={handleKeyDown}
+                onFocus={() => setShowSuggestions(true)}
               />
             </SearchContainer>
             {showSuggestions && suggestions.length > 0 && (
@@ -404,7 +406,10 @@ const isNarrowScreen = useMediaQuery("(max-width:475px)");
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: { xs: 1, sm: 2 },
+              gap: {
+                xs: 1,
+                sm: 2,
+              },
             }}
           >
             <Link href="/basket">
@@ -425,17 +430,31 @@ const isNarrowScreen = useMediaQuery("(max-width:475px)");
                     "& .MuiBadge-badge": {
                       backgroundColor: "#008c99",
                       color: "#fff",
-                      
-                      fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                      minWidth: { xs: 16, sm: 20 },
-                      height: { xs: 16, sm: 20 },
+                      fontSize: {
+                        xs: "0.8rem",
+                        sm: "0.9rem",
+                      },
+                      minWidth: {
+                        xs: 16,
+                        sm: 20,
+                      },
+                      height: {
+                        xs: 16,
+                        sm: 20,
+                      },
                     },
                   }}
                 >
                   <ShoppingCartIcon
                     sx={{
-                      width: { xs: 24, sm: 28 },
-                      height: { xs: 24, sm: 28 },
+                      width: {
+                        xs: 24,
+                        sm: 28,
+                      },
+                      height: {
+                        xs: 24,
+                        sm: 28,
+                      },
                     }}
                   />
                 </Badge>
