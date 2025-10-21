@@ -48,9 +48,6 @@ Das Projekt ist für Vercel optimiert und kann einfach deployed werden:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/barco-blanco-store)
 
-## 📝 License
-
-MIT License - siehe [LICENSE](LICENSE) für Details.
 
 
 
