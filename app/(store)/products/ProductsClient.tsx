@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import { Pagination } from "../../../components/ui/pagination";
 import Product from "../../../components/ui/Product";
 import { Button } from "@/components/ui/button";
@@ -73,7 +72,9 @@ export default function ProductsClient({
       );
 
   useEffect(() => {
-    setSelectedWidths([]);
+    if (selectedCategory) {
+      setSelectedWidths([]);
+    }
   }, [selectedCategory]);
 
   const toggleWidth = (width: number) => {
@@ -351,46 +352,40 @@ export default function ProductsClient({
             {/* Список товаров */}
             <div className="flex-1">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                <AnimatePresence>
-                  {paginatedProducts.length > 0 ? (
-                    paginatedProducts.map((product) => (
-                      <motion.div
-                        key={product._id}
-                        className="w-full bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02] p-4 flex flex-col justify-between min-h-[450px]"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <div>
-                          <Product product={product} />
-                        </div>
-                        <div className="mt-2 flex items-center justify-between gap-2">
-                          <span className="whitespace-nowrap text-lg sm:text-xl md:text-2xl font-normal text-[#1996A3]">
-                            ₴{product.price}
-                          </span>
-                          <Button
-                            onClick={() => handleAddToCart(product)}
-                            className="bg-[#4FA7B9] hover:bg-[#1996A3] text-white px-3 py-2 rounded-md transition flex items-center justify-center"
-                          >
-                            <Image
-                              src="/icons/cart.png"
-                              alt="Cart"
-                              width={20}
-                              height={20}
-                            />
-                          </Button>
-                        </div>
-                      </motion.div>
-                    ))
-                  ) : (
-                    <div className="col-span-full flex justify-center items-center">
-                      <p className="text-center text-gray-500">
-                        Немає товарів, що відповідають вибраним фільтрам.
-                      </p>
+                {paginatedProducts.length > 0 ? (
+                  paginatedProducts.map((product) => (
+                    <div
+                      key={product._id}
+                      className="w-full bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02] p-4 flex flex-col justify-between min-h-[450px]"
+                    >
+                      <div>
+                        <Product product={product} />
+                      </div>
+                      <div className="mt-2 flex items-center justify-between gap-2">
+                        <span className="whitespace-nowrap text-lg sm:text-xl md:text-2xl font-normal text-[#1996A3]">
+                          ₴{product.price}
+                        </span>
+                        <Button
+                          onClick={() => handleAddToCart(product)}
+                          className="bg-[#4FA7B9] hover:bg-[#1996A3] text-white px-3 py-2 rounded-md transition flex items-center justify-center"
+                        >
+                          <Image
+                            src="/icons/cart.png"
+                            alt="Cart"
+                            width={20}
+                            height={20}
+                          />
+                        </Button>
+                      </div>
                     </div>
-                  )}
-                </AnimatePresence>
+                  ))
+                ) : (
+                  <div className="col-span-full flex justify-center items-center">
+                    <p className="text-center text-gray-500">
+                      Немає товарів, що відповідають вибраним фільтрам.
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="w-full mt-6 flex justify-center">
                 <Pagination
@@ -410,19 +405,11 @@ export default function ProductsClient({
       </div>
 
       {/* Сообщение об успехе */}
-      <AnimatePresence>
-        {successMessage && (
-          <motion.div
-            initial={{ x: "100%", opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: "100%", opacity: 0 }}
-            transition={{ type: "spring", duration: 0.5 }}
-            className="fixed bottom-4 right-4 bg-white border border-[#1996A3] text-[#1996A3] px-6 py-4 shadow-xl rounded-lg text-xl z-50"
-          >
-            {successMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {successMessage && (
+        <div className="fixed bottom-4 right-4 bg-white border border-[#1996A3] text-[#1996A3] px-6 py-4 shadow-xl rounded-lg text-xl z-50 animate-slide-in">
+          {successMessage}
+        </div>
+      )}
     </>
   );
 }

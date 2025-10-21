@@ -871,6 +871,23 @@ body {
 /* Цена продукта */
 .product-price {
   margin-top: 5px;
+}
+
+/* Animation for success message */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.5s ease-out;
+
   font-size: 14px;
   color: #008c99;
 }
