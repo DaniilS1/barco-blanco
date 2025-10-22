@@ -369,7 +369,7 @@ const Navbar: FC = () => {
         <Toolbar
           sx={{
             marginTop: "-10px",
-            minHeight: isScrolled ? 50 : 60,
+            minHeight: isScrolled ? 60 : 60,
             maxWidth: "1400px",
             width: "100%",
             mx: "auto",
@@ -578,10 +578,10 @@ const Navbar: FC = () => {
             sx={{
               backgroundColor: "white",
               width: "100%",
-              padding: "20px",
+              padding: "25px",
               display: "flex",
               flexDirection: "column",
-              gap: "16px",
+              gap: "10px",
               animation: "slideDown 0.3s ease-out",
               borderBottomLeftRadius: "16px",
               borderBottomRightRadius: "16px",

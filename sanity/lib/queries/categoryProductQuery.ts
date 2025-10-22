@@ -14,6 +14,6 @@ export const categoryProductQuery = (category: string) => `
     category,
     width, depth, height,
     isPopular,
-    
+    isAvailable,
   }
 `;
