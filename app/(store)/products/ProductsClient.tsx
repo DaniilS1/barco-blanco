@@ -17,6 +17,7 @@ interface ProductType {
   width?: number;
   category?: string;
   image?: { asset: { url: string } }[];
+  isAvailable?: boolean;
 }
 
 interface ProductsClientProps {
@@ -362,10 +363,18 @@ export default function ProductsClient({
                       <div>
                         <Product product={product} />
                       </div>
-                      <div className="mt-2 flex items-center justify-between gap-2">
-                        <span className="whitespace-nowrap text-lg sm:text-xl md:text-2xl font-normal text-[#1996A3]">
-                          ₴{product.price}
-                        </span>
+                      <div className="mt-2 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="whitespace-nowrap text-lg sm:text-xl md:text-2xl font-normal text-[#1996A3]">
+                            ₴{product.price}
+                          </span>
+                          {/* Stock Status - Kreis direkt neben dem Preis */}
+                          {product.isAvailable ? (
+                            <div className="w-2 h-2 bg-green-500 rounded-full" title="В наявності"></div>
+                          ) : (
+                            <div className="w-2 h-2 bg-red-500 rounded-full" title="Немає в наявності"></div>
+                          )}
+                        </div>
                         <Button
                           onClick={() => handleAddToCart(product)}
                           className="bg-[#4FA7B9] hover:bg-[#1996A3] text-white px-3 py-2 rounded-md transition flex items-center justify-center"

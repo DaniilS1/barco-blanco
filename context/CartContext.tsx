@@ -2,7 +2,6 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { toast } from "react-hot-toast";
 
 export interface CartItem {
   id: string;
@@ -21,12 +20,19 @@ interface CartContextType {
   getTotalItems: () => number;
   clearCart: () => void;
   getCartTotalPrice: () => number;
+  // Modal state
+  showSuccessModal: boolean;
+  setShowSuccessModal: (show: boolean) => void;
+  lastAddedProduct: CartItem | null;
+  setLastAddedProduct: (product: CartItem | null) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [lastAddedProduct, setLastAddedProduct] = useState<CartItem | null>(null);
 
   // ✅ Загрузка из localStorage (только один useEffect!)
   useEffect(() => {
@@ -49,20 +55,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCart((prevCart) => {
       const existing = prevCart.find((i) => i.id === item.id);
       if (existing) {
-        toast.success("Кількість товару оновлено 🛒");
         return prevCart.map((i) =>
           i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
         );
       } else {
-        toast.success("Товар додано до кошика 🛒");
         return [...prevCart, item];
       }
     });
+    // Show success modal
+    setLastAddedProduct(item);
+    setShowSuccessModal(true);
   };
 
   const removeFromCart = (id: string) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== id));
-    toast("Товар видалено з кошика 🗑️", { icon: "🗑️" });
   };
 
   const updateQuantity = (id: string, quantity: number) => {
@@ -73,7 +79,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => {
     setCart([]);
-    toast("Кошик очищено");
   };
 
   const getTotalItems = () => {
@@ -94,6 +99,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         getTotalItems,
         getCartTotalPrice,
+        showSuccessModal,
+        setShowSuccessModal,
+        lastAddedProduct,
+        setLastAddedProduct,
       }}
     >
       {children}

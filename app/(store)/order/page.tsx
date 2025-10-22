@@ -496,6 +496,18 @@ export default function OrderForm() {
                                             width: "100%",
                                             maxWidth: "100%",
                                             minHeight: 42,
+                                          }),
+                                          input: (provided) => ({
+                                            ...provided,
+                                            fontSize: '16px', // Verhindert Auto-Zoom auf Mobile
+                                          }),
+                                          singleValue: (provided) => ({
+                                            ...provided,
+                                            fontSize: '16px',
+                                          }),
+                                          placeholder: (provided) => ({
+                                            ...provided,
+                                            fontSize: '16px',
                                           })
                                         }}
                                         menuPortalTarget={document.body}
@@ -552,6 +564,10 @@ export default function OrderForm() {
                                               maxWidth: "100%",
                                               minHeight: 42,
                                             }),
+                                            input: (provided) => ({
+                                              ...provided,
+                                              fontSize: '16px', // Verhindert Auto-Zoom auf Mobile
+                                            }),
                                             valueContainer: (provided) => ({
                                               ...provided,
                                               maxWidth: "calc(100% - 40px)",
@@ -563,12 +579,14 @@ export default function OrderForm() {
                                               overflow: "hidden",
                                               textOverflow: "ellipsis",
                                               whiteSpace: "nowrap",
+                                              fontSize: '16px',
                                             }),
                                             placeholder: (provided) => ({
                                               ...provided,
                                               overflow: "hidden",
                                               textOverflow: "ellipsis",
                                               whiteSpace: "nowrap",
+                                              fontSize: '16px',
                                             })
                                           }}
                                           menuPortalTarget={document.body}
@@ -640,6 +658,18 @@ export default function OrderForm() {
                                             width: "100%",
                                             maxWidth: "100%",
                                             minHeight: 42,
+                                          }),
+                                          input: (provided) => ({
+                                            ...provided,
+                                            fontSize: '16px', // Verhindert Auto-Zoom auf Mobile
+                                          }),
+                                          singleValue: (provided) => ({
+                                            ...provided,
+                                            fontSize: '16px',
+                                          }),
+                                          placeholder: (provided) => ({
+                                            ...provided,
+                                            fontSize: '16px',
                                           })
                                         }}
                                         menuPortalTarget={document.body}
@@ -689,6 +719,10 @@ export default function OrderForm() {
                                               maxWidth: "100%",
                                               minHeight: 42,
                                             }),
+                                            input: (provided) => ({
+                                              ...provided,
+                                              fontSize: '16px', // Verhindert Auto-Zoom auf Mobile
+                                            }),
                                             valueContainer: (provided) => ({
                                               ...provided,
                                               maxWidth: "calc(100% - 40px)",
@@ -700,12 +734,14 @@ export default function OrderForm() {
                                               overflow: "hidden",
                                               textOverflow: "ellipsis",
                                               whiteSpace: "nowrap",
+                                              fontSize: '16px',
                                             }),
                                             placeholder: (provided) => ({
                                               ...provided,
                                               overflow: "hidden",
                                               textOverflow: "ellipsis",
                                               whiteSpace: "nowrap",
+                                              fontSize: '16px',
                                             })
                                           }}
                                           menuPortalTarget={document.body}
