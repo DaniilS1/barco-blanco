@@ -7,6 +7,7 @@ import Product from "../../../components/ui/Product";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import Image from "next/image";
+import ScrollToTopButton from "@/components/ui/ScrollToTopButton";
 
 interface ProductType {
   _id: string;
@@ -410,6 +411,9 @@ export default function ProductsClient({
           {successMessage}
         </div>
       )}
+
+      {/* Scroll to Top Button */}
+      <ScrollToTopButton />
     </>
   );
 }
