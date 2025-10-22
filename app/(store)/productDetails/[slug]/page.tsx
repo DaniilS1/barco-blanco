@@ -6,6 +6,22 @@ import ProductDetails from "@/components/ui/ProductDetails";
 import { client } from "@/sanity/lib/client";
 import { Suspense } from "react";
 
+// Define the ProductType interface based on the Sanity schema
+interface ProductType {
+  _id: string;
+  name: string;
+  slug: { current: string };
+  price: number;
+  details: string;
+  image: { asset: { url: string }; alt?: string }[];
+  category: string;
+  width: number;
+  isPopular?: boolean;
+  height: number;
+  depth: number;
+  isAvailable: boolean;
+}
+
 // Function to fetch product data from Sanity using the slug.
 async function getProduct(slug: string) {
   try {
@@ -31,7 +47,7 @@ async function getSimilarProducts(category: string, currentProductSlug: string) 
     
     // Filter products from same category and exclude current product
     return allProducts.filter(
-      (product: any) => 
+      (product: ProductType) => 
         product.category?.toLowerCase() === category.toLowerCase() && 
         product.slug?.current !== currentProductSlug
     ).slice(0, 4);
