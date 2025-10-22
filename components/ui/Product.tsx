@@ -13,10 +13,11 @@ interface ProductType {
   name: string;
   slug?: { current: string } | null;
   price: number;
+  isAvailable?: boolean;
 }
 
 const Product: React.FC<ProductProps> = ({ product }) => {
-  const { image, name, slug } = product;
+  const { image, name, slug, price, isAvailable } = product;
 
   const imageUrl =
   image && Array.isArray(image) && image.length > 0 && image[0]?.asset?.url
@@ -41,6 +42,22 @@ const Product: React.FC<ProductProps> = ({ product }) => {
         <p className="mt-3 text-gray-800 text-sm sm:text-base font-medium line-clamp-2 flex-grow flex items-center justify-center text-center">
           {name} (No Link)
         </p>
+        {/* Price */}
+        <p className="mt-2 text-lg font-bold text-gray-900">
+          {price.toFixed(2)} грн
+        </p>
+        {/* Stock Status */}
+        <div className="mt-1">
+          {isAvailable ? (
+            <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+              В наявності
+            </span>
+          ) : (
+            <span className="inline-block px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+              Немає в наявності
+            </span>
+          )}
+        </div>
       </div>
     );
   }
@@ -63,6 +80,24 @@ const Product: React.FC<ProductProps> = ({ product }) => {
         <p className="mt-3 text-gray-800 text-sm sm:text-base font-medium line-clamp-2 flex-grow flex items-center justify-center text-center">
           {name}
         </p>
+        
+        {/* Price */}
+        <p className="mt-2 text-lg font-bold text-gray-900">
+          {price.toFixed(2)} грн
+        </p>
+        
+        {/* Stock Status */}
+        <div className="mt-1">
+          {isAvailable ? (
+            <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+              В наявності
+            </span>
+          ) : (
+            <span className="inline-block px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+              Немає в наявності
+            </span>
+          )}
+        </div>
       </div>
     </Link>
   );
