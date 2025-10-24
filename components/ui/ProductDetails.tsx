@@ -395,18 +395,20 @@ export default function ProductDetails({ productData, similarProducts = [], isLo
         </div>
       </div>
 
-      {similarProducts && similarProducts.length > 0 && (
-        <div className="mt-12">
-          <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-6">Схожі товари</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {similarProducts.slice(0, 4).map((product) => (
-              <div key={product._id} className="w-full">
-                <Product product={product} />
+        
+            {similarProducts && similarProducts.length > 0 && (
+              <div className="mt-12">
+                <h3 className="text-2xl md:text-3xl lg:text-3xl font-bold text-[#1996A3] mb-6">СХОЖІ ТОВАРИ</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                  {similarProducts.slice(0, 4).map((product) => (
+                    <div key={product._id} className="w-full">
+                      <Product product={product} />
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            )}
+    
     </div>
   );
 }
