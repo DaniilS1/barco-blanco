@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import CreatableSelect from "react-select/creatable";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { RadioGroup } from '@headlessui/react';
 import PaymentMethod from "@/components/ui/PaymentMethod";
 import {
   FormControl,
@@ -144,11 +143,6 @@ const formSchema = z
   });
 
 
-const paymentMethods = [
-  { id: 'by_agreement', label: 'По домовленості' }
-];
-
-
 export default function OrderForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedToggle, setSelectedToggle] = useState("");
@@ -157,7 +151,8 @@ export default function OrderForm() {
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [loadingWarehouses, setLoadingWarehouses] = useState(false);
   const [open, setOpen] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<string>("");
+  // не используем текущее значение selectedPayment — нужен только сеттер
+  const [, setSelectedPayment] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
 
@@ -314,15 +309,6 @@ export default function OrderForm() {
   }
 
   const totalPrice = getCartTotalPrice()
-
-  const handleSelectPayment = (value: string) => {
-    // Wenn das Feld schon ausgewählt ist → wieder abwählen
-    if (selectedPayment === value) {
-      setSelectedPayment("");
-    } else {
-      setSelectedPayment(value);
-    }
-  };
 
   useEffect(() => {
     setIsClient(true);
@@ -792,7 +778,7 @@ export default function OrderForm() {
                 {/* уменьшил верхний внутренний отступ, чтобы заголовок и иконка были ближе */}
                 <CardContent className="p-2">
                   <div className="w-full m-0 p-0 pt-0">
-                    <PaymentMethod email="barcoblanco@ukr.net" selectedLabel="По домовленості" />
+                    <PaymentMethod selectedLabel="По домовленості" />
                   </div>
                 </CardContent>
               </Card>
