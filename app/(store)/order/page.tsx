@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea"
 import CreatableSelect from "react-select/creatable";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { RadioGroup } from '@headlessui/react';
+import PaymentMethod from "@/components/ui/PaymentMethod";
 import {
   FormControl,
   FormField,
@@ -38,6 +39,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormProvider } from "react-hook-form";
 import ErrorModal from "@/components/ui/ErrorModal";
 import SuccessModal from "@/components/ui/SuccessModal";
+
 
 
 
@@ -158,7 +160,7 @@ export default function OrderForm() {
   const [selectedPayment, setSelectedPayment] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
-  
+
   // Error Modal State
   const [errorModal, setErrorModal] = useState({
     isOpen: false,
@@ -260,7 +262,7 @@ export default function OrderForm() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        
+
         // Check for specific error types
         if (response.status === 500) {
           // Email service error
@@ -343,7 +345,7 @@ export default function OrderForm() {
   // Save form data on change
   useEffect(() => {
     if (!isClient) return;
-    
+
     const subscription = form.watch((value) => {
       localStorage.setItem('orderFormData', JSON.stringify(value));
     });
@@ -353,10 +355,11 @@ export default function OrderForm() {
   return (
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-        <div className="grid gap-5 sm:grid-cols-1 md:grid-cols-2 py-12 text-lg max-w-7xl mx-auto mt-0 p-3 overflow-hidden">
+        <div className="grid gap-5 sm:grid-cols-1 md:grid-cols-2 pt-6 pb-8 text-lg max-w-7xl mx-auto mt-0 px-0 overflow-hidden">
+          {/* left column (формы) */}
           <Card className="border-none shadow-none outline-none ring-0 p-0 gap-0 max-w-full overflow-hidden">
             <CardContent>
-              <Card className="shadow-md p-4 m-2 w-full">
+              <Card className="shadow-md p-4 md:m-2 m-0 w-full">
                 <CardHeader>
                   <CardTitle className="text-[#1996A3] text-[25px] font-semibold">
                     Контактні дані
@@ -423,7 +426,7 @@ export default function OrderForm() {
                   )} />
                 </CardContent>
               </Card>
-              <Card className="shadow-md p-4 m-2 w-full max-w-full overflow-hidden">
+              <Card className="shadow-md p-4 md:m-2 m-0 w-full max-w-full overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-[#1996A3] text-[20px] md:text-[25px] font-semibold">
                     Доставка
@@ -484,7 +487,7 @@ export default function OrderForm() {
                                       <CreatableSelect
                                         options={cities}
                                         value={selectedCity ? { value: selectedCity, label: selectedCity } : null}
-                                        styles={{ 
+                                        styles={{
                                           menu: (provided) => ({ ...provided, zIndex: 9999 }),
                                           container: (provided) => ({
                                             ...provided,
@@ -551,7 +554,7 @@ export default function OrderForm() {
                                               <span>Завантаження відділень...</span>
                                             </div>
                                           )}
-                                          styles={{ 
+                                          styles={{
                                             menu: (provided) => ({ ...provided, zIndex: 9999 }),
                                             container: (provided) => ({
                                               ...provided,
@@ -646,7 +649,7 @@ export default function OrderForm() {
                                       <CreatableSelect
                                         options={cities}
                                         value={selectedCity ? { value: selectedCity, label: selectedCity } : null}
-                                        styles={{ 
+                                        styles={{
                                           menu: (provided) => ({ ...provided, zIndex: 9999 }),
                                           container: (provided) => ({
                                             ...provided,
@@ -779,65 +782,26 @@ export default function OrderForm() {
                 </CardContent>
               </Card>
 
-
-
-              <Card className="shadow-md p-4 m-2 w-full">
+              <Card className="shadow-md md:m-2 m-0 w-full">
                 <CardHeader>
                   <CardTitle className="text-[#1996A3] text-[25px] font-semibold w-full">
                     Оплата
                   </CardTitle>
-                  <CardContent>
-                    <RadioGroup name="paymentMethods"
-                      value={selectedPayment}
-                      onChange={(value) => {
-                        handleSelectPayment(value);
-                        form.setValue("paymentMethods", value);
-                      }}
-                    >
-                      <div className="space-y-2 mt-8">
-                        {paymentMethods.map((method) => (
-                          <RadioGroup.Option
-                            key={method.id}
-                            value={method.label}
-                            className={({ checked }) =>
-                              `flex items-center justify-between gap-3 cursor-pointer rounded-lg px-4 py-2 border transition
-                           ${checked ? 'bg-[#1996A3] text-white border-[#1996A3]' : 'bg-white border-gray-300'}`
-                            }
-                          >
-                            {({ checked }) => (
-                              <>
-                                <span className="text-sm">{method.label}</span>
-                                <div
-                                  className={`h-4 w-4 rounded-full border-2 flex items-center justify-center
-                                ${checked ? 'border-white' : 'border-gray-300'}`}
-                                >
-                                  {checked && <div className="h-2 w-2 rounded-full bg-white" />}
-                                </div>
-                              </>
-                            )}
-                          </RadioGroup.Option>
-                        ))}
-                        <RadioGroup.Option className="hidden" value="" />
-                      </div>
-                    </RadioGroup>
-                    {selectedPayment && (
-                      <div className="mt-4 text-[13px] text-gray-600">
-                        Вибрано: {paymentMethods.find(m => m.label === selectedPayment)?.label}
-                      </div>
-                    )}
-
-                  </CardContent>
                 </CardHeader>
-                <CardContent>
 
+                {/* уменьшил верхний внутренний отступ, чтобы заголовок и иконка были ближе */}
+                <CardContent className="p-2">
+                  <div className="w-full m-0 p-0 pt-0">
+                    <PaymentMethod email="barcoblanco@ukr.net" selectedLabel="По домовленості" />
+                  </div>
                 </CardContent>
               </Card>
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-none outline-none ring-0 p-0 gap-0 max-w-full overflow-hidden">
+          <Card className="border-none shadow-none outline-none ring-0 p-0 gap-0 max-w-full overflow-hidden text-center md:text-left">
             <CardContent className="space-y-5 overflow-hidden">
-              <Card className="shadow-md p-4 m-2 w-full">
+              <Card className="shadow-md p-4 md:m-2 m-0 w-full">
                 <CardHeader>
                   <CardTitle className="text-[#1996A3] text-[25px] font-semibold">
                     Підсумок замовлення
@@ -845,67 +809,69 @@ export default function OrderForm() {
                 </CardHeader>
 
                 <CardContent>
-                  <div className=" p-4 rounded-lg space-y-3 text-[13px]">
-                    <div className="flex justify-between border-b pb-2">
+                  <div className="p-4 rounded-lg space-y-3 text-[13px] text-center md:text-left">
+                    <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
                       <span className="font-semibold text-gray-600">Прізвище:</span>
-                      <span>{form.watch("lastName") || "Не вказано"}</span>
+                      <span className="mt-1 md:mt-0">{form.watch("lastName") || "Не вказано"}</span>
                     </div>
-                    <div className="flex justify-between border-b pb-2">
+                    <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
                       <span className="font-semibold text-gray-600">Ім&apos;я:</span>
-                      <span>{form.watch("firstName") || "Не вказано"}</span>
+                      <span className="mt-1 md:mt-0">{form.watch("firstName") || "Не вказано"}</span>
                     </div>
-                    <div className="flex justify-between border-b pb-2">
+                    <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
                       <span className="font-semibold text-gray-600">Електронна пошта:</span>
-                      <span>{form.watch("email") || "Не вказано"}</span>
+                      <span className="mt-1 md:mt-0">{form.watch("email") || "Не вказано"}</span>
                     </div>
-                    <div className="flex justify-between border-b pb-2">
+                    <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
                       <span className="font-semibold text-gray-600">Телефон:</span>
-                      <span>{form.watch("phone") || "Не вказано"}</span>
+                      <span className="mt-1 md:mt-0">{form.watch("phone") || "Не вказано"}</span>
                     </div>
-                    <div className="flex justify-between border-b pb-2">
+                    <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
                       <span className="font-semibold text-gray-600">Адреса:</span>
-                      <span>{form.watch("address") || "Не вказано"}</span>
+                      <span className="mt-1 md:mt-0">{form.watch("address") || "Не вказано"}</span>
                     </div>
                     {form.watch("city") && (
-                      <div className="flex justify-between border-b pb-2">
+                      <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
                         <span className="font-semibold text-gray-600">Місто:</span>
-                        <span>{form.watch("city")}</span>
+                        <span className="mt-1 md:mt-0">{form.watch("city")}</span>
                       </div>
                     )}
                     {form.watch("deliveryMethod") && (
-                      <div className="flex justify-between border-b pb-2">
+                      <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
                         <span className="font-semibold text-gray-600">Доставка:</span>
-                        <span>{form.watch("deliveryMethod") === "pickup"
-                          ? "Самовивіз"
-                          : form.watch("deliveryMethod") === "ukr-poshta"
-                            ? "Укр Пошта"
-                            : form.watch("deliveryMethod") === "nova-poshta"
-                              ? "Нова Пошта"
-                              : "Не вказано"}</span>
+                        <span className="mt-1 md:mt-0">
+                          {form.watch("deliveryMethod") === "pickup"
+                            ? "Самовивіз"
+                            : form.watch("deliveryMethod") === "ukr-poshta"
+                              ? "Укр Пошта"
+                              : form.watch("deliveryMethod") === "nova-poshta"
+                                ? "Нова Пошта"
+                                : "Не вказано"}
+                        </span>
                       </div>
                     )}
                     {form.watch("warehouse") && (
-                      <div className="flex justify-between border-b pb-2">
+                      <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
                         <span className="font-semibold text-gray-600">Відділення:</span>
-                        <span className="truncate max-w-[200px] sm:max-w-[300px] overflow-hidden text-right">{form.watch("warehouse")}</span>
+                        <span className="truncate max-w-[300px] mt-1 md:mt-0">{form.watch("warehouse")}</span>
                       </div>
                     )}
                     {form.watch("addressCourier") && (
-                      <div className="flex justify-between border-b pb-2">
+                      <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
                         <span className="font-semibold text-gray-600">Адреса доставки:</span>
-                        <span>{form.watch("addressCourier")}</span>
+                        <span className="mt-1 md:mt-0">{form.watch("addressCourier")}</span>
                       </div>
                     )}
                     {form.watch("additionalInfo") && (
-                      <div className="flex justify-between border-b pb-2">
+                      <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
                         <span className="font-semibold text-gray-600">Додаткова інформація:</span>
-                        <span>{form.watch("additionalInfo")}</span>
+                        <span className="mt-1 md:mt-0">{form.watch("additionalInfo")}</span>
                       </div>
                     )}
                     {form.watch("paymentMethods") && (
-                      <div className="flex justify-between border-b pb-2">
+                      <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
                         <span className="font-semibold text-gray-600">Оплата:</span>
-                        <span>{form.watch("paymentMethods")}</span>
+                        <span className="mt-1 md:mt-0">{form.watch("paymentMethods")}</span>
                       </div>
                     )}
                   </div>
@@ -921,7 +887,7 @@ export default function OrderForm() {
                       </div>
                       <p className="text-lg font-semibold text-yellow-800 mb-2">Ваш кошик порожній</p>
                       <p className="text-yellow-700 mb-4">Додайте товари до кошика, щоб оформити замовлення</p>
-                      <Button 
+                      <Button
                         onClick={() => router.push("/products")}
                         className="bg-[#1996A3] hover:bg-[#4FA7B9] text-white"
                       >
@@ -930,14 +896,24 @@ export default function OrderForm() {
                     </div>
                   ) : (
                     cart.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between p-3 text-base mt-3 border-b">
-                        <div className="flex items-center gap-3">
-                          <Image src={item.image} width={40} height={40} alt={item.name} className="object-cover rounded" />
-                          <p className="font-semibold text-[14px]">{item.name}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <p>x{item.quantity}</p>
-                          <p>{(item.price * item.quantity).toFixed(2)} грн.</p>
+                      <div
+                        key={item.id}
+                        className="flex flex-col items-start justify-between p-3 text-base mt-3 border-b gap-3"
+                      >
+                        <div className="flex items-start gap-3 min-w-0 w-full">
+                          <Image
+                            src={item.image}
+                            width={48}
+                            height={48}
+                            alt={item.name}
+                            className="object-cover rounded w-12 h-12 flex-shrink-0"
+                          />
+                          <div className="min-w-0 w-full">
+                            <p className="font-semibold text-[16px] truncate">{item.name}</p>
+                            <p className="text-sm text-gray-500 mt-1">
+                              x{item.quantity} · {(item.price * item.quantity).toFixed(2)} грн.
+                            </p>
+                          </div>
                         </div>
                       </div>
                     ))
@@ -945,11 +921,11 @@ export default function OrderForm() {
 
                 </CardContent>
                 <CardFooter>
-                  <p className="text-xl font-semibold p-2">Всього: {totalPrice.toFixed(2)} грн.</p>
+                  <p className="text-xl font-semibold p-2 text-center md:text-right">Всього: {totalPrice.toFixed(2)} грн.</p>
                 </CardFooter>
-                <Button 
-                  type="submit" 
-                  className="w-full bg-[#1996A3] hover:bg-[#167A8A] sm:w-auto text-white text-lg font-semibold py-3" 
+                <Button
+                  type="submit"
+                  className="w-full bg-[#1996A3] hover:bg-[#167A8A] sm:w-auto text-white text-lg font-semibold py-3"
                   disabled={isSubmitting || cart.length === 0}
                 >
                   {isSubmitting ? (
@@ -982,7 +958,7 @@ export default function OrderForm() {
         title="Замовлення успішно оформлене!"
         message="Вам надіслано підтвердження на пошту. Наш менеджер зв'яжеться з вами найближчим часом."
       />
-      
+
       {/* Error Modal */}
       <ErrorModal
         isOpen={errorModal.isOpen}
