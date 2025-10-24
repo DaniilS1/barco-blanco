@@ -1,177 +1,207 @@
 // app/(store)/contacts/page.tsx
 "use client";
 import React from "react";
-import { Box, Typography, Link } from "@mui/material";
+// удалил NextLink и IconButton (если больше нигде не используются)
+import { Box, Typography, Container, Grid, Button } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import PhoneIcon from "@mui/icons-material/Phone";
+import EmailIcon from "@mui/icons-material/Email";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import Image from "next/image";
 import "@/app/globals.css";
 
-const Contacts = () => {
+const Accent = "#008c99";
+
+const Root = styled(Container)(() => ({
+  maxWidth: 1400,
+  paddingTop: 16, // можно заменить на число или использовать theme внутри, если нужен
+  paddingBottom: 48,
+  paddingLeft: 32,
+  paddingRight: 32,
+  "@media (max-width: 1200px)": {
+    paddingLeft: 24,
+    paddingRight: 24,
+  },
+  "@media (max-width: 600px)": {
+    paddingTop: 12,
+    paddingBottom: 32,
+    paddingLeft: 16,
+    paddingRight: 16,
+  },
+}));
+
+const InfoCard = styled(Box)(({ theme }) => ({
+  background: "#fff",
+  borderRadius: 12,
+  padding: theme.spacing(4),
+  boxShadow: "0 10px 30px rgba(22,56,60,0.06)",
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  [theme.breakpoints.down("sm")]: {
+    padding: theme.spacing(3),
+  },
+}));
+
+const HeaderBadge = styled(Box)(({ theme }) => ({
+  display: "inline-flex",
+  alignItems: "center",
+  gap: theme.spacing(1),
+  padding: theme.spacing(0.5, 1),
+  borderRadius: 999,
+  background: "rgba(0,140,153,0.08)",
+  color: Accent,
+  fontWeight: 700,
+}));
+
+export default function Contacts() {
   return (
-    <Box
-      sx={{
-        maxWidth: "1350px",
-        margin: { xs: "20px auto", md: "20px auto" },
-        px: { xs: "20px", md: "40px" },
-        display: "flex",
-        gap: { xs: "2rem", md: "3rem" },
-        flexDirection: { xs: "column", md: "row" },
-        alignItems: { xs: "center", md: "stretch" },
-      }}
-    >
-      {/* Left Section - Image (hidden on small screens) */}
-      <Box
-        sx={{
-          flex: 1,
-          position: "relative",
-          minHeight: "auto",
-          borderRadius: "8px",
-          overflow: "hidden",
-          width: "100%",
-          display: { xs: "none", md: "block" },
-        }}
-      >
-        <Image
-          src="/images/contact_photo.jpg"
-          alt="Bathroom"
-          fill
-          style={{ objectFit: "cover" }}
-        />
-      </Box>
+    <Root>
+      <Grid container spacing={4} alignItems="stretch">
+        <Grid item xs={12} md={6}>
+          <InfoCard>
+            <Box>
+              <HeaderBadge>
+                <AccessTimeIcon sx={{ fontSize: 18 }} /> ГРАФІК РОБОТИ CALL‑CENTER
+              </HeaderBadge>
 
-      {/* Right Section - Information */}
-      <Box
-        sx={{
-          flex: 1,
-          position: "relative",
-          marginLeft: { md: "30px", xs: "0" },
-          textAlign: { xs: "center", md: "left" },
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          width: "100%",
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{
-            color: "#008c99",
-            fontWeight: "bold",
-            mb: { xs: "20px", md: "50px" },
-            alignSelf: { xs: "center", md: "flex-start" },
-          }}
-        >
-          ГРАФІК РОБОТИ CALL-CENTER
-        </Typography>
+              <Typography variant="h5" sx={{ color: Accent, fontWeight: 800, mt: 2, mb: 1 }}>
+                Ми на зв&apos;язку
+              </Typography>
 
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: { xs: "center", md: "flex-start" },
-            gap: "20px",
-            mb: { xs: "20px", md: "0" },
-          }}
-        >
-          <Box>
-            <Typography variant="body1" sx={{ fontSize: { xs: "20px", md: "24px" }, mb: "10px" }}>
-              Вт-Нед:
-            </Typography>
-            <Typography variant="body1" sx={{ fontSize: { xs: "20px", md: "24px" } }}>
-              Вихідний:
-            </Typography>
-          </Box>
-          <Box>
-            <Typography
-              variant="body1"
-              sx={{ fontSize: { xs: "20px", md: "24px" }, mb: "10px", color: "#008c99" }}
-            >
-              09:00 - 18:00
-            </Typography>
-            <Typography variant="body1" sx={{ fontSize: { xs: "20px", md: "24px" }, color: "#008c99" }}>
-              Неділя
-            </Typography>
-          </Box>
-        </Box>
+              <Box
+                role="region"
+                aria-label="Графік роботи"
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                  gap: 2,
+                  mt: 1,
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    alignItems: "center",
+                    bgcolor: "rgba(0,140,153,0.03)",
+                    borderRadius: 2,
+                    p: 2,
+                  }}
+                >
+                  <AccessTimeIcon sx={{ color: Accent, fontSize: 28 }} />
+                  <Box>
+                    <Typography sx={{ fontSize: 13, color: "text.secondary", fontWeight: 700 }}>Пн–Пт</Typography>
+                    <Typography sx={{ fontSize: { xs: 18, md: 22 }, fontWeight: 900, letterSpacing: 0.2 }}>
+                      09:00 — 18:00
+                    </Typography>
+                  </Box>
+                </Box>
 
-        {/* Контактная информация */}
-        <Box sx={{ my: { xs: "20px", md: "50px" } }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1.5,
+                    bgcolor: "transparent",
+                    borderRadius: 2,
+                    p: 2,
+                    // mobile: row (one line); desktop (md+) — column (stacked)
+                    flexDirection: { xs: "row", md: "column" },
+                    alignItems: { xs: "center", md: "flex-start" },
+                  }}
+                >
+                  <Typography sx={{ fontSize: 13, color: "text.secondary", fontWeight: 700, whiteSpace: { xs: "nowrap", md: "normal" } }}>
+                    Вихідний
+                  </Typography>
+
+                  <Typography sx={{ fontSize: { xs: 18, md: 20 }, fontWeight: 800, color: "text.secondary", whiteSpace: { xs: "nowrap", md: "normal" } }}>
+                    Неділя
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box sx={{ mt: 3, display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
+                <Button
+                  component="a"
+                  href="tel:+380504730644"
+                  startIcon={<PhoneIcon />}
+                  variant="contained"
+                  sx={{
+                    bgcolor: Accent,
+                    "&:hover": { bgcolor: "#007d87" },
+                    fontWeight: 700,
+                    px: 3,
+                    width: { xs: "100%", sm: "auto" },
+                  }}
+                >
+                  +38 (050) 47-30-644
+                </Button>
+
+                <Button
+                  component="a"
+                  href="mailto:avsdom@ukr.net"
+                  startIcon={<EmailIcon />}
+                  variant="outlined"
+                  sx={{
+                    borderColor: Accent,
+                    color: Accent,
+                    fontWeight: 700,
+                    width: { xs: "100%", sm: "auto" },
+                  }}
+                >
+                  avsdom@ukr.net
+                </Button>
+              </Box>
+
+              <Typography sx={{ mt: 3, color: "text.secondary" }}>
+                Якщо у вас виникли додаткові запитання — зателефонуйте або напишіть, ми швидко допоможемо.
+              </Typography>
+            </Box>
+
+            {/* Social links removed */}
+          </InfoCard>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              alignItems: { xs: "center", md: "flex-start" },
+              borderRadius: 12,
+              overflow: "hidden",
+              height: { xs: 0, md: 420 }, // скрываем на мобильных, показываем на md+
+              boxShadow: "0 10px 30px rgba(22,56,60,0.06)",
+              position: "relative",
+              background: "linear-gradient(180deg, rgba(0,140,153,0.04), rgba(0,140,153,0.02))",
+              display: { xs: "none", md: "block" },
             }}
           >
-            <Typography
-              variant="body1"
-              component="a"
-              href="tel:+380504730644"
-              sx={{
-                fontSize: { xs: "20px", md: "24px" },
-                color: "#1996A3",
-                transition: "transform 0.2s",
-                "&:hover": { transform: "scale(1.1)" },
-              }}
-            >
-              +38 (050) 47-30-644
-            </Typography>
+            {/* decorative image — only visible on md+ */}
+            <Box sx={{ position: "absolute", inset: 0 }}>
+              <Image src="/images/contact_photo.jpg" alt="Contact" fill style={{ objectFit: "cover" }} />
+            </Box>
 
-            <Typography
-              variant="body1"
-              component="a"
-              href="mailto:avsdom@ukr.net"
+            <Box
               sx={{
-                fontSize: { xs: "20px", md: "24px" },
-                color: "#1996A3",
-                transition: "transform 0.2s",
-                "&:hover": { transform: "scale(1.1)" },
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(180deg, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0.2) 100%)",
+                display: "flex",
+                alignItems: "flex-end",
+                p: 3,
               }}
             >
-              avsdom@ukr.net
-            </Typography>
+              <Box sx={{ color: "#fff" }}>
+                <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                  Завжди раді допомогти
+                </Typography>
+                <Typography sx={{ fontSize: 14, opacity: 0.95 }}>Пишіть або телефонуйте — відповідаємо швидко</Typography>
+              </Box>
+            </Box>
           </Box>
-        </Box>
-
-        {/* Divider */}
-        <Box
-          sx={{
-            height: "2px",
-            bgcolor: "#008c99",
-            my: { xs: "20px", md: "50px" },
-            width: "100%",
-            maxWidth: { xs: "90%", md: "400px" },
-            alignSelf: { xs: "center", md: "flex-start" },
-          }}
-        />
-
-        <Typography variant="body1" sx={{ fontSize: "16px", mb: "1rem" }}>
-          Слідкуйте за нами в соціальних мережах
-        </Typography>
-
-        {/* Social Media Links */}
-        <Box
-          sx={{
-            display: "flex",
-            gap: "40px",
-            justifyContent: { xs: "center", md: "flex-start" },
-            "& a": { transition: "transform 0.2s" },
-            "& a:hover": { transform: "scale(1.1)" },
-          }}
-        >
-          <Link href="https://www.instagram.com/barco_blanco__?igsh=c2d4MXpuOW5rNG9t" target="_blank" rel="noopener noreferrer">
-            <Image src="/icons/instagram.png" alt="Instagram" width={50} height={50} />
-          </Link>
-          <Link href="https://t.me" target="_blank">
-            <Image src="/icons/telegram.png" alt="Telegram" width={50} height={50} />
-          </Link>
-          <Link href="https://www.viber.com/ua/">
-            <Image src="/icons/viber.png" alt="Viber" width={50} height={50} />
-          </Link>
-        </Box>
-      </Box>
-    </Box>
+        </Grid>
+      </Grid>
+    </Root>
   );
-};
-
-export default Contacts;
+}
 

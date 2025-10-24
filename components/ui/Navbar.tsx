@@ -24,6 +24,7 @@ import {
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import CloseIcon from "@mui/icons-material/Close";
 
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
@@ -94,21 +95,9 @@ const HoverLink = styled(Typography)({
   },
 });
 
-const BurgerMenuHeader = styled("div")({
-  display: "flex",
-  alignItems: "center",
-  padding: "16px",
-  backgroundColor: "#f5f5f5",
-  borderBottom: "1px solid #ddd",
-});
 
-const BurgerMenuContainer = styled(Box)({
-  width: 250,
-  backgroundColor: "#f5f5f5",
-  height: "100%",
-  display: "flex",
-  flexDirection: "column",
-});
+
+
 
 const Navbar: FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -256,114 +245,173 @@ const Navbar: FC = () => {
         </Box>
       )}
 
-      {/* Mobile Swipeable Drawer */}
+      {/* Mobile Swipeable Drawer - updated inner design */}
       <SwipeableDrawer
         anchor="left"
         open={drawerOpen}
         onOpen={() => setDrawerOpen(true)}
         onClose={() => setDrawerOpen(false)}
+        PaperProps={{ sx: { width: 320, bgcolor: "background.paper" } }}
       >
-        <BurgerMenuContainer>
-          <Link href="/">
-            <BurgerMenuHeader>
+        <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          {/* Header with gradient, logo, close button and contact (responsive) */}
+          <Box
+            sx={{
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              px: 3,
+              py: 2,
+              background: "linear-gradient(90deg,#008c99 0%,#1996A3 100%)",
+              color: "#fff",
+            }}
+          >
+            {/* вместо логотипа — крупный номер и график */}
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
+              <Typography sx={{ fontWeight: 800, fontSize: { xs: 16, sm: 18 } }}>
+                +38 (050) 47-30-644
+              </Typography>
+              <Typography sx={{ fontSize: { xs: 12, sm: 13 }, opacity: 0.95 }}>
+                Пн–Пт 9:00–18:00
+              </Typography>
+            </Box>
+
+            {/* spacer чтобы крестик не наезжал */}
+            <Box sx={{ flex: 1 }} />
+
+            {/* Кнопка закрытия — справа */}
+            <IconButton
+              onClick={() => setDrawerOpen(false)}
+              aria-label="Закрити меню"
+              sx={{
+                color: "#fff",
+                bgcolor: "transparent",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.06)" },
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          <Divider />
+
+          {/* Menu items: Каталог */}
+          <Box sx={{ flex: 1, overflowY: "auto", px: 1, py: 1 }}>
+            <List subheader={<Box sx={{ px: 2, pb: 1 }}><Typography sx={{ fontWeight: 700, color: "#1996A3" }}>Каталог</Typography></Box>}>
+              {[
+                { text: "Дзеркала", href: "/category/dzerkala" },
+                { text: "Тумби", href: "/category/tumby" },
+                { text: "Пенали", href: "/category/penaly" },
+                { text: "Нависні шафи", href: "/category/shafy" },
+                { text: "Водонепроникні", href: "/category/vologostiike" },
+              ].map((item) => (
+                <ListItem key={item.href} disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href={item.href}
+                    onClick={() => setDrawerOpen(false)}
+                    sx={{
+                      py: 2,
+                      px: 2,
+                      borderRadius: 1.5,
+                      "&:hover": { backgroundColor: "rgba(0,140,153,0.04)" },
+                    }}
+                  >
+                    <ListItemText
+                      primary={item.text}
+                      primaryTypographyProps={{
+                        fontSize: 15,
+                        fontWeight: 500,
+                        color: "text.primary",
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+
+            <Divider sx={{ my: 1 }} />
+
+            {/* Info section: separated */}
+            <List subheader={<Box sx={{ px: 2, pb: 1 }}><Typography sx={{ fontWeight: 700, color: "#1996A3" }}>Інформація</Typography></Box>}>
+              {[
+                { text: "Гарантія", href: "/guarantee" },
+                { text: "Доставка та оплата", href: "/delivery" },
+                { text: "Контакти", href: "/contacts" },
+              ].map((item) => (
+                <ListItem key={item.href} disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href={item.href}
+                    onClick={() => setDrawerOpen(false)}
+                    sx={{
+                      py: 1.5,
+                      px: 2,
+                      borderRadius: 1,
+                      "&:hover": { backgroundColor: "rgba(0,0,0,0.02)" },
+                    }}
+                  >
+                    <ListItemText
+                      primary={item.text}
+                      primaryTypographyProps={{
+                        fontSize: 14,
+                        fontWeight: 500,
+                        color: "text.primary",
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+
+          <Divider />
+
+          {/* CTA + Socials */}
+          <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1 }}>
+            <Link href="/basket" onClick={() => setDrawerOpen(false)}>
               <Box
-                component="img"
-                src="/icons/logo.svg"
-                alt="logo"
-                sx={{ width: 150, height: 50 }}
-              />
-            </BurgerMenuHeader>
-          </Link>
-          <Divider />
-          <List>
-            <ListItem disablePadding>
-              <ListItemButton
-                component={Link}
-                href="/products"
-                onClick={() => setDrawerOpen(false)}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bgcolor: "#008c99",
+                  color: "#fff",
+                  px: 2,
+                  py: 1.25,
+                  borderRadius: 2,
+                  fontWeight: 700,
+                }}
               >
-                <ListItemText
-                  primary="Каталог"
-                  primaryTypographyProps={{
-                    fontWeight: "bold",
-                    fontSize: 20,
-                    color: "#008c99",
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-            {[
-              { text: "Дзеркала", href: "/category/dzerkala" },
-              { text: "Тумби", href: "/category/tumby" },
-              { text: "Пенали", href: "/category/penaly" },
-              { text: "Нависні шафи", href: "/category/shafy" },
-              { text: "Водонепроникні", href: "/category/vologostiike" },
-            ].map((item) => (
-              <ListItem key={item.href} disablePadding>
-                <ListItemButton
-                  component={Link}
-                  href={item.href}
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  <ListItemText primary={item.text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
-          <List>
-            {[
-              { text: "Головна", href: "/" },
-              { text: "Каталог", href: "/products" },
-              { text: "Гарантія", href: "/guarantee" },
-              { text: "Доставка та оплата", href: "/delivery" },
-              { text: "Контакти", href: "/contacts" },
-            ].map((item) => (
-              <ListItem key={item.href} disablePadding>
-                <ListItemButton
-                  component={Link}
-                  href={item.href}
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  <ListItemText primary={item.text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
-          <List>
-            <ListItem disablePadding>
-              <ListItemButton
-                component={Link}
-                href="/basket"
-                onClick={() => setDrawerOpen(false)}
-              >
-                <ListItemText
-                  primary="Кошик"
-                  primaryTypographyProps={{
-                    fontWeight: "bold",
-                    fontSize: 20,
-                    color: "#008c99",
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          </List>
-        </BurgerMenuContainer>
+                Перейти в кошик ({getTotalItems()})
+              </Box>
+            </Link>
+
+            {/* removed simple emoji social icons per request */}
+            <Box sx={{ height: 12 }} />
+          </Box>
+        </Box>
       </SwipeableDrawer>
 
       {/* Main Navbar */}
       <AppBar
         position={isScrolled ? "fixed" : "static"}
         elevation={0}
-        sx={{ 
-          backgroundColor: isScrolled ? "rgba(255, 255, 255, 0.95)" : "transparent", 
+        sx={{
+          backgroundColor: isScrolled
+            ? "rgba(255, 255, 255, 0.95)"
+            : "transparent",
           pt: isScrolled ? (!isMobile ? "40px" : "10px") : "10px",
           backdropFilter: isScrolled ? "blur(12px)" : "none",
           transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
           zIndex: 1000,
-          boxShadow: isScrolled ? "0 4px 20px rgba(0, 0, 0, 0.08)" : "none",
-          borderBottom: isScrolled ? "1px solid rgba(0, 140, 153, 0.1)" : "none",
+          boxShadow: isScrolled
+            ? "0 4px 20px rgba(0, 0, 0, 0.08)"
+            : "none",
+          borderBottom: isScrolled
+            ? "1px solid rgba(0, 140, 153, 0.1)"
+            : "none",
         }}
       >
         <Toolbar
@@ -416,10 +464,11 @@ const Navbar: FC = () => {
             <Link href="/">
               <Box
                 component="img"
-                src="/icons/logo.svg"
+                src="/icons/logo.png"
                 alt="Logo"
                 sx={{
-                  height: 40,
+                  height: { xs: 32, sm: 40 }, // responsive height
+                  width: "auto",
                   cursor: "pointer",
                 }}
               />
@@ -596,7 +645,10 @@ const Navbar: FC = () => {
                 alignItems: "center",
               }}
             >
-              <Typography variant="h6" sx={{ color: "#008c99", fontWeight: "bold" }}>
+              <Typography
+                variant="h6"
+                sx={{ color: "#008c99", fontWeight: "bold" }}
+              >
                 Пошук товарів
               </Typography>
               <IconButton
@@ -617,7 +669,11 @@ const Navbar: FC = () => {
                   stroke="currentColor"
                   strokeWidth={2}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </IconButton>
             </Box>
