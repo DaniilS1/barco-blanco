@@ -1,16 +1,23 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 
 type Props = {
   selectedLabel?: string;
   showHeading?: boolean;
+  onChange?: (val: string) => void; // optional callback to notify parent about selection
 };
 
 export default function PaymentMethod({
   selectedLabel = "По домовленості",
   showHeading = false,
+  onChange,
 }: Props) {
+  // синхронизируем initial/updated label с родителем (form)
+  useEffect(() => {
+    onChange?.(selectedLabel);
+  }, [selectedLabel, onChange]);
+
   return (
     <div className="w-full m-0 p-0 mb-4 md:mb-6">
       {showHeading ? (

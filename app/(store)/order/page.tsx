@@ -177,7 +177,8 @@ export default function OrderForm() {
       warehouse: "",
       additionalInfo: "",
       selectedToggle: "",
-      paymentMethods: "",
+      // по умолчанию устанавливаем способ оплати, чтобы на проде/других устройствах он всегда отображался
+      paymentMethods: "По домовленості",
       pickup: "",
       deliveryMethod: undefined,
       pickupDeatails: "",
@@ -854,12 +855,11 @@ export default function OrderForm() {
                         <span className="mt-1 md:mt-0">{form.watch("additionalInfo")}</span>
                       </div>
                     )}
-                    {form.watch("paymentMethods") && (
-                      <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
-                        <span className="font-semibold text-gray-600">Оплата:</span>
-                        <span className="mt-1 md:mt-0">{form.watch("paymentMethods")}</span>
-                      </div>
-                    )}
+                    {/* показываем метод оплати всегда, по умолчанию — 'По домовленості' */}
+                    <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
+                      <span className="font-semibold text-gray-600">Оплата:</span>
+                      <span className="mt-1 md:mt-0">{form.watch("paymentMethods") || "По домовленості"}</span>
+                    </div>
                   </div>
                   <CardTitle className="text-[#1996A3] text-[20px] font-semibold py-4">
                     <p>Товари в замовленні</p>
