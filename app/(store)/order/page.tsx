@@ -356,7 +356,7 @@ export default function OrderForm() {
 
                   <FormField name="lastName" control={form.control} render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Прізвище</FormLabel>
+                      <FormLabel>Прізвище *</FormLabel>
                       <FormControl>
                         <Input placeholder="Петренко" {...field} />
                       </FormControl>
@@ -366,7 +366,7 @@ export default function OrderForm() {
 
                   <FormField name="firstName" control={form.control} render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Ім&apos;я</FormLabel>
+                      <FormLabel>Ім&apos;я *</FormLabel>
                       <FormControl>
                         <Input placeholder="Іван" {...field} />
                       </FormControl>
@@ -376,7 +376,7 @@ export default function OrderForm() {
 
                   <FormField name="email" control={form.control} render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Електронна пошта</FormLabel>
+                      <FormLabel>Електронна пошта *</FormLabel>
                       <FormControl>
                         <Input placeholder="ivan@example.com" {...field} />
                       </FormControl>
@@ -386,22 +386,14 @@ export default function OrderForm() {
 
                   <FormField name="phone" control={form.control} render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Телефон</FormLabel>
+                      <FormLabel>Телефон *</FormLabel>
                       <FormControl>
                         <Input placeholder="+38 (097) 123-4567" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
-                  <FormField name="address" control={form.control} render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Адреса</FormLabel>
-                      <FormControl>
-                        <Input placeholder="вул. Шевченка, 10" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
+                
                   <FormField name="additionalInfo" control={form.control} render={({ field }) => (
                     <FormItem>
                       <FormLabel>Додаткова інформація</FormLabel>
@@ -416,7 +408,7 @@ export default function OrderForm() {
               <Card className="shadow-md p-4 md:m-2 m-0 w-full max-w-full overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-[#1996A3] text-[20px] md:text-[25px] font-semibold">
-                    Доставка
+                    Доставка 
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="overflow-hidden">
@@ -438,7 +430,7 @@ export default function OrderForm() {
                     </TabsList>
                     {!activeTab && (
                       <div className="text-gray-500 text-sm px-4 py-2">
-                        Будь ласка, оберіть спосіб доставки
+                        Будь ласка, оберіть спосіб доставки *
                       </div>
                     )}
 
