@@ -100,7 +100,7 @@ export default function Categories() {
 
 function CategoryCard({ title, href, image }: Cat) {
   return (
-    <Link href={href} className="block">
+    <Link href={href} className="block" scroll={false}>
       <article className="relative rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-transform hover:scale-[1.03] bg-white ring-1 ring-black/5">
         {/* размеры — как у тебя были */}
         <div className="relative w-full aspect-square sm:aspect-auto sm:h-[220px] md:h-[260px] lg:h-[320px] rounded-t-3xl overflow-hidden bg-gray-100">

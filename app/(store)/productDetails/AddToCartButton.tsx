@@ -9,6 +9,7 @@ interface AddToCartButtonProps {
     name: string;
     price: number;
     image: { asset: { url: string } }[];
+    slug?: { current: string };
   };
 }
 
@@ -25,6 +26,7 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
           price: product.price,
           image: product.image[0]?.asset?.url || "/images/placeholder.svg",
           quantity: 1,
+          slug: product.slug,
         })
       }
     >

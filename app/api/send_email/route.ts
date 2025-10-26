@@ -90,112 +90,253 @@ export async function POST(request: Request) {
         const totalAmount = data.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
         const customerMessagePayByAgreement = `
-        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; color: #333;">
-  <h2 style="color: #2c3e50;">Привіт ${data.firstName},</h2>
-  <p style="font-size: 16px; color: #555;">Дякуємо за ваше замовлення! Нижче ви знайдете всі деталі:</p>
+        <div style="font-family: Arial, Helvetica, sans-serif; max-width: 800px; margin: 0 auto; padding: 0; color: #333; background-color: #ffffff;">
+  <!-- Email Header -->
+  <div style="background: linear-gradient(135deg, #1996A3 0%, #008c99 100%); padding: 30px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+    <img src="https://barcoblanco.com/icons/logo.png" alt="BarcoBlanco" style="height: 50px; width: auto; margin-bottom: 15px;">
+    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">BarcoBlanco</h1>
+    <p style="color: #e0f7ff; margin: 5px 0 0 0; font-size: 16px;">Ваш надійний партнер у світі меблів</p>
+  </div>
 
-  <ul style="list-style: none; padding: 0; font-size: 16px; color: #555; line-height: 1.6;">
-    ${data.lastName || data.firstName ? `<li><strong>Клієнт:</strong> ${data.lastName ?? ""} ${data.firstName ?? ""}</li>` : ""}
-    ${data.address ? `<li><strong>Адреса:</strong> ${data.address}</li>` : ""}
-    ${data.city ? `<li><strong>Місто:</strong> ${data.city}</li>` : ""}
-    <li><strong>Доставка:</strong> 
-      ${data.deliveryMethod === "pickup"
+  <!-- Main Content -->
+  <div style="padding: 30px 20px;">
+    <h2 style="color: #1996A3; font-size: 24px; margin: 0 0 20px 0; font-weight: 600;">Привіт ${data.firstName}! 👋</h2>
+    <p style="font-size: 16px; color: #555; margin: 0 0 25px 0; line-height: 1.6;">Дякуємо за ваше замовлення! Нижче ви знайдете всі деталі:</p>
+
+    <!-- User Data Card -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+      <h3 style="color: #1996A3; font-size: 18px; margin: 0 0 20px 0; font-weight: 600; border-bottom: 2px solid #1996A3; padding-bottom: 10px;">📋 Деталі замовлення</h3>
+      
+      <table style="width: 100%; border-collapse: collapse;">
+        <tbody>
+          ${data.lastName || data.firstName ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333; width: 30%;">👤 Клієнт:</td>
+            <td style="padding: 8px 0; color: #555;">${data.lastName ?? ""} ${data.firstName ?? ""}</td>
+          </tr>` : ""}
+          ${data.address ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">📍 Адреса:</td>
+            <td style="padding: 8px 0; color: #555;">${data.address}</td>
+          </tr>` : ""}
+          ${data.city ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🏙️ Місто:</td>
+            <td style="padding: 8px 0; color: #555;">${data.city}</td>
+          </tr>` : ""}
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🚚 Доставка:</td>
+            <td style="padding: 8px 0; color: #555;">
+              ${data.deliveryMethod === "pickup"
                 ? "Самовивіз"
                 : data.deliveryMethod === "ukr-poshta"
                     ? "Укр Пошта"
                     : data.deliveryMethod === "nova-poshta"
                         ? "Нова Пошта"
                         : "Не вказано"}
-    </li>
-    ${data.selectedToggle
-                ? `<li><strong>Вид доставки:</strong> ${data.selectedToggle === 'courier' ? "Кур'єром" : data.selectedToggle}</li>`
-                : ""}
-    ${data.warehouse ? `<li><strong>Відділення:</strong> ${data.warehouse}</li>` : ""}
-    ${data.addressCourier ? `<li><strong>Адреса кур'єра:</strong> ${data.addressCourier}</li>` : ""}
-    ${data.pickup ? `<li><strong>Самовивіз:</strong> ${data.pickup}</li>` : ""}
-    ${data.paymentMethods ? `<li><strong>Оплата:</strong> ${data.paymentMethods}</li>` : ""}
-    ${data.additionalInfo ? `<li><strong>Додаткова інформація:</strong> ${data.additionalInfo}</li>` : ""}
-    <li><strong>Загальна сума:</strong> ${totalAmount.toFixed(2)} грн.</li>
-  </ul>
-
-  <h3 style="color: #2c3e50; margin-top: 30px;">Деталі замовлення:</h3>
-  <table style="width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 15px; color: #333; margin-top: 15px;">
-    <thead>
-      <tr style="background-color: #f5f7fa;">
-        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e0e0e0; border-radius: 8px 0 0 0;">Зображення</th>
-        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e0e0e0;">Назва</th>
-        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e0e0e0;">Ціна</th>
-        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e0e0e0; border-radius: 0 8px 0 0;">Кількість</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${data.cart
-                .map((item) => `
-          <tr style="background-color: #ffffff; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-radius: 8px;">
-            <td style="padding: 12px; border-top-left-radius: 8px; border-bottom-left-radius: 8px;">
-              <img src="${item.image}" alt="${item.name}" width="70" style="border-radius: 6px;">
             </td>
-            <td style="padding: 12px;">${item.name}</td>
-            <td style="padding: 12px;">${item.price.toFixed(2)} грн.</td>
-            <td style="padding: 12px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;">${item.quantity}</td>
+          </tr>
+          ${data.selectedToggle ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">📦 Вид доставки:</td>
+            <td style="padding: 8px 0; color: #555;">${data.selectedToggle === 'courier' ? "Кур'єром" : data.selectedToggle}</td>
+          </tr>` : ""}
+          ${data.warehouse ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🏢 Відділення:</td>
+            <td style="padding: 8px 0; color: #555;">${data.warehouse}</td>
+          </tr>` : ""}
+          ${data.addressCourier ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🏠 Адреса кур'єра:</td>
+            <td style="padding: 8px 0; color: #555;">${data.addressCourier}</td>
+          </tr>` : ""}
+          ${data.pickup ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🚪 Самовивіз:</td>
+            <td style="padding: 8px 0; color: #555;">${data.pickup}</td>
+          </tr>` : ""}
+          ${data.paymentMethods ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">💳 Оплата:</td>
+            <td style="padding: 8px 0; color: #555;">${data.paymentMethods}</td>
+          </tr>` : ""}
+          ${data.additionalInfo ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">📝 Додаткова інформація:</td>
+            <td style="padding: 8px 0; color: #555;">${data.additionalInfo}</td>
+          </tr>` : ""}
+          <tr style="border-top: 2px solid #1996A3; margin-top: 15px;">
+            <td style="padding: 15px 0 8px 0; font-weight: 700; color: #1996A3; font-size: 18px;">💰 Загальна сума:</td>
+            <td style="padding: 15px 0 8px 0; color: #1996A3; font-weight: 700; font-size: 18px;">${totalAmount.toFixed(2)} грн.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Products Section -->
+    <h3 style="color: #1996A3; font-size: 20px; margin: 0 0 20px 0; font-weight: 600;">🛍️ Товари в замовленні</h3>
+    <div style="background-color: #ffffff; border: 1px solid #e9ecef; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+      <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; color: #333;">
+        <thead>
+          <tr style="background: linear-gradient(135deg, #1996A3 0%, #008c99 100%);">
+            <th style="padding: 15px 12px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px;">Зображення</th>
+            <th style="padding: 15px 12px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px;">Назва</th>
+            <th style="padding: 15px 12px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px;">Ціна</th>
+            <th style="padding: 15px 12px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px;">Кількість</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.cart
+                .map((item, index) => `
+          <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f8f9fa'};">
+            <td style="padding: 15px 12px; border-bottom: 1px solid #e9ecef;">
+              <img src="${item.image}" alt="${item.name}" width="60" height="60" style="border-radius: 8px; object-fit: cover;">
+            </td>
+            <td style="padding: 15px 12px; border-bottom: 1px solid #e9ecef; font-weight: 500;">${item.name}</td>
+            <td style="padding: 15px 12px; border-bottom: 1px solid #e9ecef; font-weight: 600; color: #1996A3;">${item.price.toFixed(2)} грн.</td>
+            <td style="padding: 15px 12px; border-bottom: 1px solid #e9ecef; text-align: center;">
+              <span style="background-color: #1996A3; color: #ffffff; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 14px;">${item.quantity}</span>
+            </td>
           </tr>
         `)
                 .join('')}
-    </tbody>
-  </table>
+        </tbody>
+      </table>
+    </div>
 
-  <p style="font-size: 16px; color: #555; margin-top: 30px;">
-    Наш менеджер зв’яжеться з вами якнайшвидше для підтвердження та обробки замовлення.<br>
-    Якщо питання термінове — зателефонуйте нам: 
-    <a href="tel:+380666924322" style="color: #3498db; text-decoration: none;">+38 (050) 47-30-644</a>.
-  </p>
+    <!-- Footer Message -->
+    <div style="background-color: #f8f9fa; border-left: 4px solid #1996A3; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+      <p style="font-size: 16px; color: #555; margin: 0 0 15px 0; line-height: 1.6;">
+        <strong>📞 Наш менеджер зв'яжеться з вами якнайшвидше</strong> для підтвердження та обробки замовлення.
+      </p>
+      <p style="font-size: 16px; color: #555; margin: 0; line-height: 1.6;">
+        Якщо питання термінове — зателефонуйте нам: 
+        <a href="tel:+380504730644" style="color: #1996A3; text-decoration: none; font-weight: 600;">+38 (050) 47-30-644</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Email Footer -->
+  <div style="background-color: #f5f7fa; padding: 20px; text-align: center; border-radius: 0 0 12px 12px; border-top: 1px solid #e9ecef;">
+    <p style="color: #6c757d; font-size: 14px; margin: 0;">© 2024 BarcoBlanco. Всі права захищені.</p>
+  </div>
 </div>
 `;
 
 
 
         const customerMessage = `
-    <h2 style="color: #333;">Привіт ${data.firstName},</h2>
-    <p style="font-size: 16px; color: #555;">Дякуємо за ваше замовлення! Ось його деталі:</p>
-    <ul style="font-size: 16px; color: #555;">
-        <li><b>Клієнт:</b> ${data.lastName} ${data.firstName}</li>
-        ${data.address ? `<li><b>Адреса:</b> ${data.address}</li>` : ""}
-        ${data.city ? `<li><b>Місто:</b> ${data.city}</li>` : ""}
-        <li><b>Вид доставки:</b> ${data.selectedToggle
+        <div style="font-family: Arial, Helvetica, sans-serif; max-width: 800px; margin: 0 auto; padding: 0; color: #333; background-color: #ffffff;">
+  <!-- Email Header -->
+  <div style="background: linear-gradient(135deg, #1996A3 0%, #008c99 100%); padding: 30px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+    <img src="https://barcoblanco.com/icons/logo.png" alt="BarcoBlanco" style="height: 50px; width: auto; margin-bottom: 15px;">
+    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">BarcoBlanco</h1>
+    <p style="color: #e0f7ff; margin: 5px 0 0 0; font-size: 16px;">Ваш надійний партнер у світі меблів</p>
+  </div>
+
+  <!-- Main Content -->
+  <div style="padding: 30px 20px;">
+    <h2 style="color: #1996A3; font-size: 24px; margin: 0 0 20px 0; font-weight: 600;">Привіт ${data.firstName}! 👋</h2>
+    <p style="font-size: 16px; color: #555; margin: 0 0 25px 0; line-height: 1.6;">Дякуємо за ваше замовлення! Ось його деталі:</p>
+
+    <!-- User Data Card -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+      <h3 style="color: #1996A3; font-size: 18px; margin: 0 0 20px 0; font-weight: 600; border-bottom: 2px solid #1996A3; padding-bottom: 10px;">📋 Деталі замовлення</h3>
+      
+      <table style="width: 100%; border-collapse: collapse;">
+        <tbody>
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333; width: 30%;">👤 Клієнт:</td>
+            <td style="padding: 8px 0; color: #555;">${data.lastName} ${data.firstName}</td>
+          </tr>
+          ${data.address ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">📍 Адреса:</td>
+            <td style="padding: 8px 0; color: #555;">${data.address}</td>
+          </tr>` : ""}
+          ${data.city ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🏙️ Місто:</td>
+            <td style="padding: 8px 0; color: #555;">${data.city}</td>
+          </tr>` : ""}
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🚚 Вид доставки:</td>
+            <td style="padding: 8px 0; color: #555;">
+              ${data.selectedToggle
                 ? (data.selectedToggle === 'courier' ? "Кур'єром" : data.selectedToggle)
-                : "Не вказано"}  
-        </li>
-        ${data.warehouse ? `<li><b>Відділення:</b> ${data.warehouse}</li>` : ""}
-        ${data.addressCourier ? `<li><b>Адреса кур'єра:</b> ${data.addressCourier}</li>` : ""}
-        ${data.pickup ? `<li><b>Самовивіз:</b> ${data.pickup}</li>` : ""}
-        <li><b>Оплата:</b> ${data.paymentMethods}</li>
-        <li><b>Загальна сума:</b> ${totalAmount.toFixed(2)} грн.</li>
-    </ul>
-    <h3 style="color: #333;">Деталі замовлення:</h3>
-    <table role="presentation" style="width: 800px; border-collapse: collapse; font-size: 16px; color: #333; display: block !important; visibility: visible !important;">
+                : "Не вказано"}
+            </td>
+          </tr>
+          ${data.warehouse ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🏢 Відділення:</td>
+            <td style="padding: 8px 0; color: #555;">${data.warehouse}</td>
+          </tr>` : ""}
+          ${data.addressCourier ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🏠 Адреса кур'єра:</td>
+            <td style="padding: 8px 0; color: #555;">${data.addressCourier}</td>
+          </tr>` : ""}
+          ${data.pickup ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🚪 Самовивіз:</td>
+            <td style="padding: 8px 0; color: #555;">${data.pickup}</td>
+          </tr>` : ""}
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">💳 Оплата:</td>
+            <td style="padding: 8px 0; color: #555;">${data.paymentMethods}</td>
+          </tr>
+          <tr style="border-top: 2px solid #1996A3; margin-top: 15px;">
+            <td style="padding: 15px 0 8px 0; font-weight: 700; color: #1996A3; font-size: 18px;">💰 Загальна сума:</td>
+            <td style="padding: 15px 0 8px 0; color: #1996A3; font-weight: 700; font-size: 18px;">${totalAmount.toFixed(2)} грн.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Products Section -->
+    <h3 style="color: #1996A3; font-size: 20px; margin: 0 0 20px 0; font-weight: 600;">🛍️ Товари в замовленні</h3>
+    <div style="background-color: #ffffff; border: 1px solid #e9ecef; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+      <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; color: #333;">
         <thead>
-            <tr style="background-color: #f8f8f8;">
-                <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: left;">Зображення</th>
-                <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: left;">Назва</th>
-                <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: left;">Ціна</th>
-                <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: left;">Кількість</th>
-            </tr>
+          <tr style="background: linear-gradient(135deg, #1996A3 0%, #008c99 100%);">
+            <th style="padding: 15px 12px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px;">Зображення</th>
+            <th style="padding: 15px 12px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px;">Назва</th>
+            <th style="padding: 15px 12px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px;">Ціна</th>
+            <th style="padding: 15px 12px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px;">Кількість</th>
+          </tr>
         </thead>
         <tbody>
-            ${data.cart.map((item, index) => `
-                <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f9f9f9'};">
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">
-                        <img src="${item.image}" alt="${item.name}" width="80" style="border-radius: 8px; display: block;">
-                    </td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${item.name}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${item.price.toFixed(2)} грн.</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${item.quantity}</td>
-                </tr>
-            `).join('')}
+          ${data.cart.map((item, index) => `
+          <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f8f9fa'};">
+            <td style="padding: 15px 12px; border-bottom: 1px solid #e9ecef;">
+              <img src="${item.image}" alt="${item.name}" width="60" height="60" style="border-radius: 8px; object-fit: cover;">
+            </td>
+            <td style="padding: 15px 12px; border-bottom: 1px solid #e9ecef; font-weight: 500;">${item.name}</td>
+            <td style="padding: 15px 12px; border-bottom: 1px solid #e9ecef; font-weight: 600; color: #1996A3;">${item.price.toFixed(2)} грн.</td>
+            <td style="padding: 15px 12px; border-bottom: 1px solid #e9ecef; text-align: center;">
+              <span style="background-color: #1996A3; color: #ffffff; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 14px;">${item.quantity}</span>
+            </td>
+          </tr>
+          `).join('')}
         </tbody>
-    </table>
+      </table>
+    </div>
 
-    <p style="font-size: 16px; color: #555;">Ми починаємо обробку вашого замовлення і скоро зв’яжемося з вами для підтвердження.</p>
+    <!-- Footer Message -->
+    <div style="background-color: #f8f9fa; border-left: 4px solid #1996A3; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+      <p style="font-size: 16px; color: #555; margin: 0; line-height: 1.6;">
+        <strong>📞 Ми починаємо обробку вашого замовлення</strong> і скоро зв'яжемося з вами для підтвердження.
+      </p>
+    </div>
+  </div>
+
+  <!-- Email Footer -->
+  <div style="background-color: #f5f7fa; padding: 20px; text-align: center; border-radius: 0 0 12px 12px; border-top: 1px solid #e9ecef;">
+    <p style="color: #6c757d; font-size: 14px; margin: 0;">© 2024 BarcoBlanco. Всі права захищені.</p>
+  </div>
+</div>
 `;
 
 
@@ -203,59 +344,146 @@ export async function POST(request: Request) {
 
         // HTML-Template for manager
         const managerMessage = `
-        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; color: #333;">
-  <h2 style="color: #2c3e50;">НОВЕ ЗАМОВЛЕННЯ</h2>
+        <div style="font-family: Arial, Helvetica, sans-serif; max-width: 800px; margin: 0 auto; padding: 0; color: #333; background-color: #ffffff;">
+  <!-- Email Header with NEW ORDER Badge -->
+  <div style="background: linear-gradient(135deg, #1996A3 0%, #008c99 100%); padding: 30px 20px; text-align: center; border-radius: 12px 12px 0 0; position: relative;">
+    <img src="https://barcoblanco.com/icons/logo.png" alt="BarcoBlanco" style="height: 50px; width: auto; margin-bottom: 15px;">
+    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">BarcoBlanco</h1>
+    <p style="color: #e0f7ff; margin: 5px 0 0 0; font-size: 16px;">Система управління замовленнями</p>
+    
+    <!-- NEW ORDER Badge -->
+    <div style="position: absolute; top: 20px; right: 20px; background-color: #ff4757; color: #ffffff; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+      НОВЕ ЗАМОВЛЕННЯ
+    </div>
+  </div>
 
-  <ul style="list-style: none; padding: 0; font-size: 16px; color: #555; line-height: 1.6;">
-    ${data.lastName || data.firstName ? `<li><strong>Клієнт:</strong> ${data.lastName ?? ""} ${data.firstName ?? ""}</li>` : ""}
-    ${data.email ? `<li><strong>Email:</strong> ${data.email}</li>` : ""}
-    ${data.phone ? `<li><strong>Телефон:</strong> ${data.phone}</li>` : ""}
-    ${(data.address || data.city) ? `<li><strong>Адреса:</strong> ${data.address ?? ""}${data.city ? ", " + data.city : ""}</li>` : ""}
-    <li><strong>Доставка:</strong> 
-      ${data.deliveryMethod === "pickup"
-          ? "Самовивіз"
-          : data.deliveryMethod === "ukr-poshta"
-              ? "Укр Пошта"
-              : data.deliveryMethod === "nova-poshta"
-                  ? "Нова Пошта"
-                  : "Не вказано"}
-    </li>
-    ${data.selectedToggle
-        ? `<li><strong>Вид доставки:</strong> ${data.selectedToggle === 'courier' ? "Кур'єром" : data.selectedToggle}</li>`
-        : ""}
-    ${data.warehouse ? `<li><strong>Відділення:</strong> ${data.warehouse}</li>` : ""}
-    ${data.addressCourier ? `<li><strong>Адреса кур'єра:</strong> ${data.addressCourier}</li>` : ""}
-    ${data.pickup ? `<li><strong>Самовивіз:</strong> ${data.pickup}</li>` : ""}
-    ${data.paymentMethods ? `<li><strong>Оплата:</strong> ${data.paymentMethods}</li>` : ""}
-    ${data.additionalInfo ? `<li><strong>Додаткова інформація:</strong> ${data.additionalInfo}</li>` : ""}
-    <li><strong>Загальна сума:</strong> ${totalAmount.toFixed(2)} грн.</li>
-  </ul>
+  <!-- Main Content -->
+  <div style="padding: 30px 20px;">
+    <h2 style="color: #1996A3; font-size: 24px; margin: 0 0 20px 0; font-weight: 600;">📋 Деталі замовлення</h2>
 
-  <h3 style="color: #2c3e50; margin-top: 30px;">Деталі замовлення:</h3>
-  <table style="width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 15px; color: #333; margin-top: 15px;">
-    <thead>
-      <tr style="background-color: #f5f7fa;">
-        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e0e0e0; border-radius: 8px 0 0 0;">Зображення</th>
-        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e0e0e0;">Назва</th>
-        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e0e0e0;">Ціна</th>
-        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e0e0e0; border-radius: 0 8px 0 0;">Кількість</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${data.cart
-        .map((item) => `
-          <tr style="background-color: #ffffff; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-radius: 8px;">
-            <td style="padding: 12px; border-top-left-radius: 8px; border-bottom-left-radius: 8px;">
-              <img src="${item.image}" alt="${item.name}" width="70" style="border-radius: 6px;">
+    <!-- Customer Data Card -->
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+      <h3 style="color: #1996A3; font-size: 18px; margin: 0 0 20px 0; font-weight: 600; border-bottom: 2px solid #1996A3; padding-bottom: 10px;">👤 Інформація про клієнта</h3>
+      
+      <table style="width: 100%; border-collapse: collapse;">
+        <tbody>
+          ${data.lastName || data.firstName ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333; width: 30%;">👤 Клієнт:</td>
+            <td style="padding: 8px 0; color: #555;">${data.lastName ?? ""} ${data.firstName ?? ""}</td>
+          </tr>` : ""}
+          ${data.email ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">📧 Email:</td>
+            <td style="padding: 8px 0; color: #555;">
+              <a href="mailto:${data.email}" style="color: #1996A3; text-decoration: none;">${data.email}</a>
             </td>
-            <td style="padding: 12px;">${item.name}</td>
-            <td style="padding: 12px;">${item.price.toFixed(2)} грн.</td>
-            <td style="padding: 12px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;">${item.quantity}</td>
+          </tr>` : ""}
+          ${data.phone ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">📞 Телефон:</td>
+            <td style="padding: 8px 0; color: #555;">
+              <a href="tel:${data.phone}" style="color: #1996A3; text-decoration: none;">${data.phone}</a>
+            </td>
+          </tr>` : ""}
+          ${(data.address || data.city) ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">📍 Адреса:</td>
+            <td style="padding: 8px 0; color: #555;">${data.address ?? ""}${data.city ? ", " + data.city : ""}</td>
+          </tr>` : ""}
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🚚 Доставка:</td>
+            <td style="padding: 8px 0; color: #555;">
+              ${data.deliveryMethod === "pickup"
+                  ? "Самовивіз"
+                  : data.deliveryMethod === "ukr-poshta"
+                      ? "Укр Пошта"
+                      : data.deliveryMethod === "nova-poshta"
+                          ? "Нова Пошта"
+                          : "Не вказано"}
+            </td>
+          </tr>
+          ${data.selectedToggle ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">📦 Вид доставки:</td>
+            <td style="padding: 8px 0; color: #555;">${data.selectedToggle === 'courier' ? "Кур'єром" : data.selectedToggle}</td>
+          </tr>` : ""}
+          ${data.warehouse ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🏢 Відділення:</td>
+            <td style="padding: 8px 0; color: #555;">${data.warehouse}</td>
+          </tr>` : ""}
+          ${data.addressCourier ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🏠 Адреса кур'єра:</td>
+            <td style="padding: 8px 0; color: #555;">${data.addressCourier}</td>
+          </tr>` : ""}
+          ${data.pickup ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">🚪 Самовивіз:</td>
+            <td style="padding: 8px 0; color: #555;">${data.pickup}</td>
+          </tr>` : ""}
+          ${data.paymentMethods ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">💳 Оплата:</td>
+            <td style="padding: 8px 0; color: #555;">${data.paymentMethods}</td>
+          </tr>` : ""}
+          ${data.additionalInfo ? `
+          <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #333;">📝 Додаткова інформація:</td>
+            <td style="padding: 8px 0; color: #555;">${data.additionalInfo}</td>
+          </tr>` : ""}
+          <tr style="border-top: 2px solid #1996A3; margin-top: 15px;">
+            <td style="padding: 15px 0 8px 0; font-weight: 700; color: #1996A3; font-size: 18px;">💰 Загальна сума:</td>
+            <td style="padding: 15px 0 8px 0; color: #1996A3; font-weight: 700; font-size: 18px;">${totalAmount.toFixed(2)} грн.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Products Section -->
+    <h3 style="color: #1996A3; font-size: 20px; margin: 0 0 20px 0; font-weight: 600;">🛍️ Товари в замовленні</h3>
+    <div style="background-color: #ffffff; border: 1px solid #e9ecef; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+      <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; color: #333;">
+        <thead>
+          <tr style="background: linear-gradient(135deg, #1996A3 0%, #008c99 100%);">
+            <th style="padding: 15px 12px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px;">Зображення</th>
+            <th style="padding: 15px 12px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px;">Назва</th>
+            <th style="padding: 15px 12px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px;">Ціна</th>
+            <th style="padding: 15px 12px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px;">Кількість</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.cart
+            .map((item, index) => `
+          <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f8f9fa'};">
+            <td style="padding: 15px 12px; border-bottom: 1px solid #e9ecef;">
+              <img src="${item.image}" alt="${item.name}" width="60" height="60" style="border-radius: 8px; object-fit: cover;">
+            </td>
+            <td style="padding: 15px 12px; border-bottom: 1px solid #e9ecef; font-weight: 500;">${item.name}</td>
+            <td style="padding: 15px 12px; border-bottom: 1px solid #e9ecef; font-weight: 600; color: #1996A3;">${item.price.toFixed(2)} грн.</td>
+            <td style="padding: 15px 12px; border-bottom: 1px solid #e9ecef; text-align: center;">
+              <span style="background-color: #1996A3; color: #ffffff; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 14px;">${item.quantity}</span>
+            </td>
           </tr>
         `)
-        .join('')}
-    </tbody>
-  </table>
+            .join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Action Required Notice -->
+    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-left: 4px solid #f39c12; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+      <p style="font-size: 16px; color: #856404; margin: 0; line-height: 1.6;">
+        <strong>⚠️ Потрібна дія:</strong> Зв'яжіться з клієнтом для підтвердження замовлення та уточнення деталей доставки.
+      </p>
+    </div>
+  </div>
+
+  <!-- Email Footer -->
+  <div style="background-color: #f5f7fa; padding: 20px; text-align: center; border-radius: 0 0 12px 12px; border-top: 1px solid #e9ecef;">
+    <p style="color: #6c757d; font-size: 14px; margin: 0;">© 2024 BarcoBlanco. Система управління замовленнями</p>
+  </div>
 </div>`;
 
         await sendEmail(MANAGER_EMAIL, "Нове замовлення отримано", managerMessage);

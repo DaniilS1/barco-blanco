@@ -1,6 +1,7 @@
 "use client";
 import { useCart } from "@/context/CartContext";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -55,19 +56,42 @@ export default function BasketPage() {
                 <div className="flex flex-col md:flex-row gap-4 col-span-full md:col-span-1 h-full">
                   {/* изменено: добавил items-center и w-full */}
                   <div className="flex gap-4 items-center w-full">
-                    <Image
-                      src={item.image}
-                      width={80}
-                      height={80}
-                      alt={item.name}
-                      className="object-cover rounded-md shrink-0"
-                    />
+                    {item.slug?.current ? (
+                      <Link href={`/productDetails/${item.slug.current}`} className="shrink-0 block">
+                        <Image
+                          src={item.image}
+                          width={80}
+                          height={80}
+                          alt={item.name}
+                          className="object-cover rounded-md hover:opacity-80 transition-opacity cursor-pointer"
+                        />
+                      </Link>
+                    ) : (
+                      <Image
+                        src={item.image}
+                        width={80}
+                        height={80}
+                        alt={item.name}
+                        className="object-cover rounded-md shrink-0"
+                      />
+                    )}
                     {/* изменено: центрируем контейнер и даем ему ширину */}
                     <div className="flex flex-col justify-center items-center h-full py-1 w-full">
-                      {/* изменено: добавлен text-center */}
-                      <h2 className="text-base sm:text-lg font-medium text-[#1996A3] leading-tight line-clamp-2 text-center">
-                        {item.name}
-                      </h2>
+                      {/* изменено: добавлен text-center - теперь видно на всех устройствах */}
+                      {item.slug?.current ? (
+                        <Link 
+                          href={`/productDetails/${item.slug.current}`} 
+                          className="w-full block hover:bg-gray-50 rounded-md p-2 -m-2 transition-colors"
+                        >
+                          <h2 className="text-base sm:text-lg font-medium text-[#1996A3] leading-tight line-clamp-2 text-center hover:text-[#147A86] transition-colors cursor-pointer">
+                            {item.name}
+                          </h2>
+                        </Link>
+                      ) : (
+                        <h2 className="text-base sm:text-lg font-medium text-[#1996A3] leading-tight line-clamp-2 text-center">
+                          {item.name}
+                        </h2>
+                      )}
 
                       <div className="mt-2 space-y-2 text-sm text-gray-700 md:hidden">
                         <div className="flex justify-between w-[180px]">

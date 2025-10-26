@@ -106,6 +106,7 @@ export default function ProductsClient({
       price: product.price,
       image: product.image?.[0]?.asset.url || "/images/placeholder.svg",
       quantity,
+      slug: product.slug,
     });
     setSuccessMessage("Товар успішно доданий до кошика!");
     setTimeout(() => setSuccessMessage(""), 3000);

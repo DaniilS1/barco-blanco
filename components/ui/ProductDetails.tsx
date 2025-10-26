@@ -31,6 +31,7 @@ interface ProductDetailsProps {
     article?: string;
     reviewsCount?: number;
     isAvailable?: boolean;
+    slug?: { current: string };
   };
   similarProducts?: {
     _id: string;
@@ -67,6 +68,11 @@ export default function ProductDetails({ productData, similarProducts = [], isLo
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
+  // Ensure page starts at top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const images =
     Array.isArray(image) && image.length > 0
       ? image.filter(img => img?.asset?.url)
@@ -79,6 +85,7 @@ export default function ProductDetails({ productData, similarProducts = [], isLo
       price,
       image: images[0]?.asset?.url || "/images/placeholder.svg",
       quantity: quantity,
+      slug: productData.slug,
     });
   };
 

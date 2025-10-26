@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -361,7 +362,7 @@ export default function OrderForm() {
           {/* left column (формы) */}
           <Card className="border-none shadow-none outline-none ring-0 p-0 gap-0 max-w-full overflow-hidden">
             <CardContent>
-              <Card className="shadow-md p-4 md:m-2 m-0 w-full">
+              <Card className="shadow-md p-4 md:m-2 my-4 w-full">
                 <CardHeader>
                   <CardTitle className="text-[#1996A3] text-[25px] font-semibold">
                     Контактні дані
@@ -420,7 +421,7 @@ export default function OrderForm() {
                   )} />
                 </CardContent>
               </Card>
-              <Card className="shadow-md p-4 md:m-2 m-0 w-full max-w-full overflow-hidden">
+              <Card className="shadow-md p-4 md:m-2 my-4 w-full max-w-full overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-[#1996A3] text-[20px] md:text-[25px] font-semibold">
                     Доставка 
@@ -438,7 +439,7 @@ export default function OrderForm() {
                       form.setValue("warehouse", "");
                     }
                   }} className="w-full overflow-hidden">
-                    <TabsList className="flex flex-wrap sm:flex-nowrap overflow-x-auto gap-2 w-full mb-2">
+                    <TabsList className="flex flex-nowrap overflow-x-auto gap-2 w-full mb-2">
                       <TabsTrigger value="nova-poshta"><Image src={logo} alt="Nova Poshta" className="w-3 h-auto mr-2" />Нова Пошта</TabsTrigger>
                       <TabsTrigger value="ukr-poshta" className="hidden"><Image src={ukrLogo} alt="Ukr Poshta" className="w-2 h-auto mr-2" />Укр Пошта</TabsTrigger>
                       <TabsTrigger value="pickup"><Image src={pickupLogo} alt="Pickup" className="w-5 h-auto mr-2" />Самовивіз</TabsTrigger>
@@ -776,7 +777,7 @@ export default function OrderForm() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-md md:m-2 m-0 w-full">
+              <Card className="shadow-md md:m-2 my-4 w-full">
                 <CardHeader>
                   <CardTitle className="text-[#1996A3] text-[25px] font-semibold w-full">
                     Оплата
@@ -795,7 +796,7 @@ export default function OrderForm() {
 
           <Card className="border-none shadow-none outline-none ring-0 p-0 gap-0 max-w-full overflow-hidden text-center md:text-left">
             <CardContent className="space-y-5 overflow-hidden">
-              <Card className="shadow-md p-4 md:m-2 m-0 w-full">
+              <Card className="shadow-md p-4 md:m-2 my-4 w-full">
                 <CardHeader>
                   <CardTitle className="text-[#1996A3] text-[25px] font-semibold">
                     Підсумок замовлення
@@ -891,15 +892,36 @@ export default function OrderForm() {
                         className="flex flex-col items-start justify-between p-3 text-base mt-3 border-b gap-3"
                       >
                         <div className="flex items-start gap-3 min-w-0 w-full">
-                          <Image
-                            src={item.image}
-                            width={48}
-                            height={48}
-                            alt={item.name}
-                            className="object-cover rounded w-12 h-12 flex-shrink-0"
-                          />
+                          {item.slug?.current ? (
+                            <Link href={`/productDetails/${item.slug.current}`} className="flex-shrink-0 block">
+                              <Image
+                                src={item.image}
+                                width={48}
+                                height={48}
+                                alt={item.name}
+                                className="object-cover rounded w-12 h-12 hover:opacity-80 transition-opacity cursor-pointer"
+                              />
+                            </Link>
+                          ) : (
+                            <Image
+                              src={item.image}
+                              width={48}
+                              height={48}
+                              alt={item.name}
+                              className="object-cover rounded w-12 h-12 flex-shrink-0"
+                            />
+                          )}
                           <div className="min-w-0 w-full">
-                            <p className="font-semibold text-[16px] truncate">{item.name}</p>
+                            {item.slug?.current ? (
+                              <Link 
+                                href={`/productDetails/${item.slug.current}`} 
+                                className="block hover:bg-gray-50 rounded-md p-2 -m-2 transition-colors"
+                              >
+                                <p className="font-semibold text-[16px] sm:text-[18px] truncate hover:text-[#147A86] transition-colors cursor-pointer">{item.name}</p>
+                              </Link>
+                            ) : (
+                              <p className="font-semibold text-[16px] sm:text-[18px] truncate">{item.name}</p>
+                            )}
                             <p className="text-sm text-gray-500 mt-1">
                               x{item.quantity} · {(item.price * item.quantity).toFixed(2)} грн.
                             </p>
