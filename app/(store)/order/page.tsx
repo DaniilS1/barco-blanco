@@ -65,8 +65,8 @@ type OrderFormData = {
 
   city?: string;                         // Stadt (für NP/UP)
   warehouse?: string;                    // Відділення oder поштомат
-  addressCourier?: string;              // Wenn Lieferung per Kurier
-  address?: string;                      // Optional: feste Adresse z. B. bei Abholung
+  addressCourier?: string;              // Якщо доставка кур'єром
+  // address поле удалено
 
   // Weitere Angaben
   additionalInfo?: string;
@@ -97,7 +97,6 @@ const formSchema = z
     lastName: z.string().min(2, { message: "Введіть правильне прізвище." }),
     email: z.string().email({ message: "Некоректна електронна пошта." }),
     phone: z.string().min(10, { message: "Введіть правильний номер телефону." }),
-    address: z.string().min(5, { message: "Введіть правильну адресу." }),
     addressCourier: z.string().optional(),
     city: z.string().nullable().optional(),
     warehouse: z.string().optional(),
@@ -171,7 +170,6 @@ export default function OrderForm() {
       lastName: "",
       email: "",
       phone: "",
-      address: "",
       addressCourier: "",
       city: selectedCity || "",
       warehouse: "",
@@ -805,10 +803,7 @@ export default function OrderForm() {
                       <span className="font-semibold text-gray-600">Телефон:</span>
                       <span className="mt-1 md:mt-0">{form.watch("phone") || "Не вказано"}</span>
                     </div>
-                    <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
-                      <span className="font-semibold text-gray-600">Адреса:</span>
-                      <span className="mt-1 md:mt-0">{form.watch("address") || "Не вказано"}</span>
-                    </div>
+                    {/* поле "Адреса" удалено из Summary */}
                     {form.watch("city") && (
                       <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start border-b pb-2">
                         <span className="font-semibold text-gray-600">Місто:</span>
