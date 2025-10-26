@@ -1166,3 +1166,15 @@ body.modal-open {
 .scrollbar-hide::-webkit-scrollbar { 
   display: none;  /* Safari and Chrome */
 }
+
+input::placeholder,
+textarea::placeholder {
+  opacity: 0.5;
+  color: inherit;
+}
+
+/* react-select (используется classNamePrefix="react-select") */
+.react-select__placeholder {
+  opacity: 0.5;
+  color: #9CA3AF;
+}
