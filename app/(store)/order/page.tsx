@@ -145,15 +145,14 @@ const formSchema = z
 export default function OrderForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedToggle, setSelectedToggle] = useState("");
-  const { cart, getCartTotalPrice } = useCart();
+  const { cart, getCartTotalPrice, clearCart } = useCart();
   const [selectedCity, setSelectedCity] = useState<string>();
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [loadingWarehouses, setLoadingWarehouses] = useState(false);
   const [open, setOpen] = useState(false);
-  // не используем текущее значение selectedPayment — нужен только сеттер
-  const [, setSelectedPayment] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
+  const [isResetting, setIsResetting] = useState(false);
 
   // Error Modal State
   const [errorModal, setErrorModal] = useState({
@@ -287,12 +286,30 @@ export default function OrderForm() {
       }
 
       // Success
+      setIsResetting(true);
       setOpen(true);
-      form.reset();
-      setSelectedPayment("");
+      form.reset({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        addressCourier: "",
+        city: "",
+        warehouse: "",
+        additionalInfo: "",
+        selectedToggle: "",
+        paymentMethods: "По домовленості",
+        pickup: "",
+        deliveryMethod: undefined,
+        pickupDeatails: "",
+      });
       setSelectedCity(undefined);
       setWarehouses([]);
-      localStorage.removeItem('orderFormData'); // Clear saved data
+      setSelectedToggle("");
+      setActiveTab(undefined);
+      localStorage.removeItem('orderFormData');
+      clearCart();
+      setTimeout(() => setIsResetting(false), 100);
     } catch (error) {
       // Network error or other unexpected error
       console.error("Order submission error:", error);
@@ -329,13 +346,13 @@ export default function OrderForm() {
 
   // Save form data on change
   useEffect(() => {
-    if (!isClient) return;
+    if (!isClient || isResetting) return;
 
     const subscription = form.watch((value) => {
       localStorage.setItem('orderFormData', JSON.stringify(value));
     });
     return () => subscription.unsubscribe();
-  }, [form, isClient]);
+  }, [form, isClient, isResetting]);
 
   return (
     <FormProvider {...form}>
