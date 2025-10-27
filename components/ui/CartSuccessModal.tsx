@@ -2,9 +2,10 @@
 
 import React from "react";
 import { Dialog, DialogContent, Box, Typography, Button, IconButton } from "@mui/material";
-import { CheckCircle, Close, ShoppingCart } from "@mui/icons-material";
-import { useCart } from "@/context/CartContext";
+import { Close, ShoppingCart } from "@mui/icons-material";
+import { CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 interface CartSuccessModalProps {
   open: boolean;
@@ -17,7 +18,6 @@ export default function CartSuccessModal({
   onClose, 
   productName
 }: CartSuccessModalProps) {
-  const { getTotalItems } = useCart();
   const router = useRouter();
 
   const handleViewCart = () => {
@@ -38,7 +38,7 @@ export default function CartSuccessModal({
       sx={{
         "& .MuiDialog-paper": {
           borderRadius: "16px",
-          padding: "24px",
+          padding: "18px",
         },
       }}
     >
@@ -56,21 +56,17 @@ export default function CartSuccessModal({
           <Close />
         </IconButton>
 
-        {/* Success icon */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            mb: 3,
-          }}
-        >
-          <CheckCircle
-            sx={{
-              fontSize: 64,
-              color: "#4CAF50",
-            }}
-          />
-        </Box>
+         {/* Success Icon */}
+         <div className="flex justify-center mb-4">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", duration: 0.6 }}
+                  className="w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full flex items-center justify-center"
+                >
+                  <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-green-500" />
+                </motion.div>
+              </div>
 
         {/* Success message */}
         <Typography
@@ -97,22 +93,7 @@ export default function CartSuccessModal({
           </Typography>
         )}
 
-        {/* Cart total */}
-        <Box
-          sx={{
-            backgroundColor: "#f5f5f5",
-            borderRadius: "8px",
-            padding: "16px",
-            mb: 3,
-          }}
-        >
-          <Typography variant="body2" color="#666" sx={{ mb: 1 }}>
-            Всього товарів у кошику:
-          </Typography>
-          <Typography variant="h6" sx={{ color: "#008c99", fontWeight: "bold" }}>
-            {getTotalItems()} шт.
-          </Typography>
-        </Box>
+      
 
         {/* Action buttons */}
         <Box
