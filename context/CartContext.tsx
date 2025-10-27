@@ -38,6 +38,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [lastAddedProduct, setLastAddedProduct] = useState<CartItem | null>(null);
   const [isCartLoaded, setIsCartLoaded] = useState(false);
   const [isLocalStorageAvailable, setIsLocalStorageAvailable] = useState(true);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   // ✅ SSR-safe localStorage loading
   useEffect(() => {
@@ -56,7 +57,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // Load cart from localStorage
       const storedCart = localStorage.getItem("cart");
       if (storedCart) {
-        setCart(JSON.parse(storedCart));
+        try {
+          const parsedCart = JSON.parse(storedCart);
+          setCart(parsedCart);
+        } catch (error) {
+          console.error('Error parsing cart from localStorage:', error);
+          // Clear corrupted data
+          localStorage.removeItem("cart");
+        }
       }
     } catch (error) {
       console.error("localStorage not available:", error);
@@ -70,12 +78,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     } finally {
       setIsCartLoaded(true);
-      // Debug logging
-      console.log('Cart loaded:', { 
-        isCartLoaded: true, 
-        isLocalStorageAvailable, 
-        cartLength: cart.length 
-      });
+      setHasInitialized(true);
     }
   }, []);
 
@@ -83,13 +86,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isCartLoaded) return;
     if (!isLocalStorageAvailable) return;
+    if (!hasInitialized) return; // Don't save during initial load
     
     try {
       localStorage.setItem("cart", JSON.stringify(cart));
     } catch (error) {
       console.error("Error saving cart to localStorage:", error);
     }
-  }, [cart, isCartLoaded, isLocalStorageAvailable]);
+  }, [cart, isCartLoaded, isLocalStorageAvailable, hasInitialized]);
 
   const addToCart = (item: CartItem) => {
     setCart((prevCart) => {
