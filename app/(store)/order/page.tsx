@@ -39,6 +39,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormProvider } from "react-hook-form";
 import ErrorModal from "@/components/ui/ErrorModal";
 import SuccessModal from "@/components/ui/SuccessModal";
+import { toast } from "react-hot-toast";
 
 
 
@@ -51,7 +52,7 @@ type CartItem = {
   image: string;
 };
 
-type DeliveryMethod = "nova-poshta" | "ukrposhta" | "pickup" | string;
+type DeliveryMethod = "nova-poshta" | "pickup" | string;
 
 type OrderFormData = {
   // Kundeninfos
@@ -106,14 +107,23 @@ const formSchema = z
     paymentMethods: z.string().min(1, { message: "Оберіть метод оплати." }),
     pickup: z.string().optional(),
     pickupDeatails: z.string().optional(),
-    deliveryMethod: z.enum(["nova-poshta", "ukr-poshta", "pickup"], {
+    deliveryMethod: z.enum(["nova-poshta", "pickup"], {
       required_error: "Оберіть спосіб доставки.",
     }),
   })
   .superRefine((data, ctx) => {
     if (data.deliveryMethod === "pickup") {
       // No additional validation needed for pickup
-    } else {
+    } else if (data.deliveryMethod === "nova-poshta") {
+      // Require selectedToggle for nova-poshta
+      if (!data.selectedToggle) {
+        ctx.addIssue({
+          path: ["selectedToggle"],
+          message: "Оберіть вид доставки.",
+          code: z.ZodIssueCode.custom,
+        });
+      }
+
       if (!data.city || data.city.trim().length < 2) {
         ctx.addIssue({
           path: ["city"],
@@ -126,7 +136,7 @@ const formSchema = z
         if (!data.addressCourier || data.addressCourier.trim().length < 5) {
           ctx.addIssue({
             path: ["addressCourier"],
-            message: "Введіть правильну адресу для кур’єра.",
+            message: "Введіть правильну адресу для кур'єра.",
             code: z.ZodIssueCode.custom,
           });
         }
@@ -154,6 +164,7 @@ export default function OrderForm() {
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
   const [isResetting, setIsResetting] = useState(false);
+  const [deliveryMethodError, setDeliveryMethodError] = useState(false);
 
   // Error Modal State
   const [errorModal, setErrorModal] = useState({
@@ -211,6 +222,25 @@ export default function OrderForm() {
   }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    // Check for empty cart
+    if (cart.length === 0) {
+      toast.error('Додайте товари до кошика');
+      return;
+    }
+    
+    // Validate delivery method first
+    if (!activeTab) {
+      setDeliveryMethodError(true);
+      toast.error('Оберіть спосіб доставки');
+      // Scroll to delivery section
+      const deliverySection = document.querySelector('[data-delivery-section]');
+      if (deliverySection) {
+        deliverySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    
+    setDeliveryMethodError(false);
     setIsSubmitting(true);
 
     const deliveryMethod = values.deliveryMethod as DeliveryMethod;
@@ -372,7 +402,9 @@ export default function OrderForm() {
 
                   <FormField name="lastName" control={form.control} render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Прізвище *</FormLabel>
+                      <FormLabel className="flex items-center gap-1">
+                        Прізвище <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Петренко" {...field} />
                       </FormControl>
@@ -382,7 +414,9 @@ export default function OrderForm() {
 
                   <FormField name="firstName" control={form.control} render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Ім&apos;я *</FormLabel>
+                      <FormLabel className="flex items-center gap-1">
+                        Ім&apos;я <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Іван" {...field} />
                       </FormControl>
@@ -392,7 +426,9 @@ export default function OrderForm() {
 
                   <FormField name="email" control={form.control} render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Електронна пошта *</FormLabel>
+                      <FormLabel className="flex items-center gap-1">
+                        Електронна пошта <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="ivan@example.com" {...field} />
                       </FormControl>
@@ -402,7 +438,9 @@ export default function OrderForm() {
 
                   <FormField name="phone" control={form.control} render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Телефон *</FormLabel>
+                      <FormLabel className="flex items-center gap-1">
+                        Телефон <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="+38 (097) 123-4567" {...field} />
                       </FormControl>
@@ -421,7 +459,7 @@ export default function OrderForm() {
                   )} />
                 </CardContent>
               </Card>
-              <Card className="shadow-md p-4 md:m-2 my-4 w-full max-w-full overflow-hidden">
+              <Card className="shadow-md p-4 md:m-2 my-4 w-full max-w-full overflow-hidden" data-delivery-section>
                 <CardHeader>
                   <CardTitle className="text-[#1996A3] text-[20px] md:text-[25px] font-semibold">
                     Доставка 
@@ -430,23 +468,28 @@ export default function OrderForm() {
                 <CardContent className="overflow-hidden">
                   <Tabs value={activeTab} onValueChange={(value) => {
                     setActiveTab(value);
-                    form.setValue("deliveryMethod", value as "nova-poshta" | "pickup" | "ukr-poshta");
+                    form.setValue("deliveryMethod", value as "nova-poshta" | "pickup");
                     if (value === "pickup") {
                       setSelectedToggle("");
                       setSelectedCity("");
                       form.setValue("selectedToggle", "");
                       form.setValue("city", "");
                       form.setValue("warehouse", "");
+                    } else if (value === "nova-poshta") {
+                      // Auto-select "Відділення" as default
+                      setSelectedToggle("Відділення");
+                      form.setValue("selectedToggle", "Відділення");
                     }
                   }} className="w-full overflow-hidden">
-                    <TabsList className="flex flex-nowrap overflow-x-auto gap-2 w-full mb-2">
+                    <TabsList className={`flex flex-nowrap overflow-x-auto gap-2 w-full mb-2 ${
+                      deliveryMethodError && !activeTab ? 'ring-2 ring-red-500' : ''
+                    }`}>
                       <TabsTrigger value="nova-poshta"><Image src={logo} alt="Nova Poshta" className="w-3 h-auto mr-2" />Нова Пошта</TabsTrigger>
-                      <TabsTrigger value="ukr-poshta" className="hidden"><Image src={ukrLogo} alt="Ukr Poshta" className="w-2 h-auto mr-2" />Укр Пошта</TabsTrigger>
                       <TabsTrigger value="pickup"><Image src={pickupLogo} alt="Pickup" className="w-5 h-auto mr-2" />Самовивіз</TabsTrigger>
                     </TabsList>
                     {!activeTab && (
-                      <div className="text-gray-500 text-sm px-4 py-2">
-                        Будь ласка, оберіть спосіб доставки *
+                      <div className="text-red-600 text-sm px-4 py-2 bg-red-50 border border-red-200 rounded-md">
+                        Будь ласка, оберіть спосіб доставки
                       </div>
                     )}
 
@@ -472,6 +515,11 @@ export default function OrderForm() {
                                 <ToggleGroupItem value="Поштомат">📦 Поштомат</ToggleGroupItem>
                                 <ToggleGroupItem value="courier">🚚 Кур&apos;єром</ToggleGroupItem>
                               </ToggleGroup>
+                              {form.formState.errors.selectedToggle && (
+                                <p className="text-sm font-medium text-red-500 mt-2">
+                                  {form.formState.errors.selectedToggle.message}
+                                </p>
+                              )}
 
                               {/* Місто */}
                               <FormField name="city" render={() => (
@@ -610,162 +658,7 @@ export default function OrderForm() {
                           </div>
                         </div>
                       </div>
-                    </TabsContent>
-
-                    {/* Укр Пошта */}
-                    <TabsContent value="ukr-poshta">
-                      <div className="w-full overflow-hidden">
-                        <div className="border-b-0 p-3 py-1 rounded-lg w-full overflow-hidden">
-                          <div className="w-full overflow-hidden">
-                            <div className="space-y-4 p-3 sm:p-5 rounded-lg text-sm sm:text-base w-full overflow-hidden">
-                              {/* ToggleGroup (відділення / поштомат / кур'єр) */}
-                              <ToggleGroup
-                                type="single"
-                                value={selectedToggle}
-                                onValueChange={(value) => {
-                                  setSelectedToggle(value);
-                                  setSelectedCity("");
-                                  form.setValue("city", "");
-                                  form.setValue("warehouse", "");
-                                }}
-                                className="flex flex-wrap gap-2 sm:gap-3"
-                              >
-                                <ToggleGroupItem value="Відділення">🏢 Відділення</ToggleGroupItem>
-                                <ToggleGroupItem value="Поштомат">📦 Поштомат</ToggleGroupItem>
-                                <ToggleGroupItem value="courier">🚚 Кур&apos;єром</ToggleGroupItem>
-                              </ToggleGroup>
-
-                              {/* Місто */}
-                              <FormField name="city" render={() => (
-                                <FormItem>
-                                  <FormLabel>Місто</FormLabel>
-                                  <FormControl>
-                                    {isClient && (
-                                      <CreatableSelect
-                                        options={cities}
-                                        value={selectedCity ? { value: selectedCity, label: selectedCity } : null}
-                                        styles={{
-                                          menu: (provided) => ({ ...provided, zIndex: 9999 }),
-                                          container: (provided) => ({
-                                            ...provided,
-                                            width: "100%",
-                                            maxWidth: "100%",
-                                          }),
-                                          control: (provided) => ({
-                                            ...provided,
-                                            width: "100%",
-                                            maxWidth: "100%",
-                                            minHeight: 42,
-                                          }),
-                                          input: (provided) => ({
-                                            ...provided,
-                                            fontSize: '16px', // Verhindert Auto-Zoom auf Mobile
-                                          }),
-                                          singleValue: (provided) => ({
-                                            ...provided,
-                                            fontSize: '16px',
-                                          }),
-                                          placeholder: (provided) => ({
-                                            ...provided,
-                                            fontSize: '16px',
-                                          })
-                                        }}
-                                        menuPortalTarget={document.body}
-                                        onChange={(city) => {
-                                          if (city) {
-                                            setSelectedCity(city.value);
-                                            form.setValue("city", city.value);
-                                            fetchWarehouses(city.value);
-                                          }
-                                        }}
-                                        placeholder="Оберіть місто"
-                                        isClearable
-                                      />
-                                    )}
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )} />
-
-                              {/* Відділення або адреса */}
-                              {selectedToggle !== "courier" ? (
-                                <FormField name="warehouse" render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Відділення</FormLabel>
-                                    <FormControl>
-                                      {isClient && (
-                                        <Select
-                                          {...field}
-                                          onChange={(selectedOption) => {
-                                            field.onChange(selectedOption?.value);
-                                            form.setValue("warehouse", selectedOption?.value || "");
-                                          }}
-                                          value={warehouses.find(w => w.Description === field.value) ? { value: field.value, label: field.value } : null}
-                                          options={warehouses.map(w => ({ value: w.Description, label: w.Description }))}
-                                          placeholder={loadingWarehouses ? "Завантаження..." : "Оберіть відділення"}
-                                          isDisabled={!selectedCity || loadingWarehouses}
-                                          styles={{
-                                            menu: (provided) => ({ ...provided, zIndex: 9999 }),
-                                            container: (provided) => ({
-                                              ...provided,
-                                              width: "100%",
-                                              maxWidth: "100%",
-                                            }),
-                                            control: (provided) => ({
-                                              ...provided,
-                                              width: "100%",
-                                              maxWidth: "100%",
-                                              minHeight: 42,
-                                            }),
-                                            input: (provided) => ({
-                                              ...provided,
-                                              fontSize: '16px', // Verhindert Auto-Zoom auf Mobile
-                                            }),
-                                            valueContainer: (provided) => ({
-                                              ...provided,
-                                              maxWidth: "calc(100% - 40px)",
-                                              overflow: "hidden",
-                                            }),
-                                            singleValue: (provided) => ({
-                                              ...provided,
-                                              maxWidth: "100%",
-                                              overflow: "hidden",
-                                              textOverflow: "ellipsis",
-                                              whiteSpace: "nowrap",
-                                              fontSize: '16px',
-                                            }),
-                                            placeholder: (provided) => ({
-                                              ...provided,
-                                              overflow: "hidden",
-                                              textOverflow: "ellipsis",
-                                              whiteSpace: "nowrap",
-                                              fontSize: '16px',
-                                            })
-                                          }}
-                                          menuPortalTarget={document.body}
-                                        />
-                                      )}
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                                />
-                              ) : (
-                                <FormField name="addressCourier" control={form.control} render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Адреса доставки</FormLabel>
-                                    <FormControl>
-                                      <Input placeholder="вул. Шевченка, 10" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )} />
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </TabsContent>
+                                        </TabsContent>
 
                     {/* Самовивіз */}
                     <TabsContent value="pickup">
@@ -834,11 +727,9 @@ export default function OrderForm() {
                         <span className="mt-1 md:mt-0">
                           {form.watch("deliveryMethod") === "pickup"
                             ? "Самовивіз"
-                            : form.watch("deliveryMethod") === "ukr-poshta"
-                              ? "Укр Пошта"
-                              : form.watch("deliveryMethod") === "nova-poshta"
-                                ? "Нова Пошта"
-                                : "Не вказано"}
+                            : form.watch("deliveryMethod") === "nova-poshta"
+                              ? "Нова Пошта"
+                              : "Не вказано"}
                         </span>
                       </div>
                     )}

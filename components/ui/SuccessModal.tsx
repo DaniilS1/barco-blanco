@@ -43,7 +43,7 @@ export default function SuccessModal({
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               transition={{ type: "spring", duration: 0.5 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-md w-full p-4 sm:p-6 relative"
+              className="bg-white rounded-2xl shadow-2xl max-w-[100vw] sm:max-w-md w-full p-4 sm:p-7 relative"
             >
               {/* Close Button */}
               <button
@@ -115,7 +115,7 @@ export default function SuccessModal({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
-                className="flex gap-2 sm:gap-3"
+                className="flex flex-col gap-2 sm:gap-3 md:flex-row w-full items-center justify-center"
               >
                 {onGoHome && (
                   <Button
