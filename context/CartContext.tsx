@@ -25,6 +25,9 @@ interface CartContextType {
   setShowSuccessModal: (show: boolean) => void;
   lastAddedProduct: CartItem | null;
   setLastAddedProduct: (product: CartItem | null) => void;
+  // Loading and storage state
+  isCartLoaded: boolean;
+  isLocalStorageAvailable: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -33,23 +36,60 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [lastAddedProduct, setLastAddedProduct] = useState<CartItem | null>(null);
+  const [isCartLoaded, setIsCartLoaded] = useState(false);
+  const [isLocalStorageAvailable, setIsLocalStorageAvailable] = useState(true);
 
-  // ✅ Загрузка из localStorage (только один useEffect!)
+  // ✅ SSR-safe localStorage loading
   useEffect(() => {
-    const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-      try {
+    if (typeof window === 'undefined') {
+      setIsCartLoaded(true);
+      return;
+    }
+    
+    try {
+      // Test localStorage availability
+      const testKey = '__localStorage_test__';
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+      setIsLocalStorageAvailable(true);
+      
+      // Load cart from localStorage
+      const storedCart = localStorage.getItem("cart");
+      if (storedCart) {
         setCart(JSON.parse(storedCart));
-      } catch (error) {
-        console.error("Error parsing cart from localStorage:", error);
       }
+    } catch (error) {
+      console.error("localStorage not available:", error);
+      setIsLocalStorageAvailable(false);
+      // Show toast notification for localStorage issues
+      if (typeof window !== 'undefined') {
+        // Import toast dynamically to avoid SSR issues
+        import('react-hot-toast').then(({ toast }) => {
+          toast.error('Увага: кошик буде працювати тільки в цій сесії');
+        });
+      }
+    } finally {
+      setIsCartLoaded(true);
+      // Debug logging
+      console.log('Cart loaded:', { 
+        isCartLoaded: true, 
+        isLocalStorageAvailable, 
+        cartLength: cart.length 
+      });
     }
   }, []);
 
-  // ✅ Сохранение в localStorage при изменении корзины
+  // ✅ Save to localStorage when cart changes (only if localStorage is available)
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+    if (!isCartLoaded) return;
+    if (!isLocalStorageAvailable) return;
+    
+    try {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    } catch (error) {
+      console.error("Error saving cart to localStorage:", error);
+    }
+  }, [cart, isCartLoaded, isLocalStorageAvailable]);
 
   const addToCart = (item: CartItem) => {
     setCart((prevCart) => {
@@ -103,6 +143,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setShowSuccessModal,
         lastAddedProduct,
         setLastAddedProduct,
+        isCartLoaded,
+        isLocalStorageAvailable,
       }}
     >
       {children}

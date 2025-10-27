@@ -155,7 +155,7 @@ const formSchema = z
 export default function OrderForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedToggle, setSelectedToggle] = useState("");
-  const { cart, getCartTotalPrice, clearCart } = useCart();
+  const { cart, getCartTotalPrice, clearCart, isCartLoaded } = useCart();
   const [selectedCity, setSelectedCity] = useState<string>();
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [loadingWarehouses, setLoadingWarehouses] = useState(false);
@@ -221,6 +221,12 @@ export default function OrderForm() {
   }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    // Check if cart is still loading
+    if (!isCartLoaded) {
+      toast.error('Кошик ще завантажується, зачекайте');
+      return;
+    }
+    
     // Check for empty cart
     if (cart.length === 0) {
       toast.error('Додайте товари до кошика');
@@ -759,7 +765,28 @@ export default function OrderForm() {
                   <CardTitle className="text-[#1996A3] text-[20px] font-semibold py-4">
                     <p>Товари в замовленні</p>
                   </CardTitle>
-                  {cart.length === 0 ? (
+                  {!isCartLoaded ? (
+                    <div className="animate-pulse space-y-4">
+                      <div className="flex items-center space-x-4 p-3 border-b">
+                        <div className="w-16 h-16 bg-gray-200 rounded"></div>
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                        </div>
+                        <div className="h-6 bg-gray-200 rounded w-16"></div>
+                      </div>
+                      <div className="flex items-center space-x-4 p-3 border-b">
+                        <div className="w-16 h-16 bg-gray-200 rounded"></div>
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                        </div>
+                        <div className="h-6 bg-gray-200 rounded w-16"></div>
+                      </div>
+                    </div>
+                  ) : cart.length === 0 ? (
                     <div className="text-center py-8 bg-yellow-50 rounded-lg border border-yellow-200">
                       <div className="text-yellow-600 mb-2">
                         <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -828,9 +855,14 @@ export default function OrderForm() {
                 <Button
                   type="submit"
                   className="w-full bg-[#1996A3] hover:bg-[#167A8A] sm:w-auto text-white text-lg font-semibold py-3"
-                  disabled={isSubmitting || cart.length === 0}
+                  disabled={isSubmitting || !isCartLoaded || cart.length === 0}
                 >
-                  {isSubmitting ? (
+                  {!isCartLoaded ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Завантаження...
+                    </div>
+                  ) : isSubmitting ? (
                     <div className="flex items-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin" />
                       Обробка...
