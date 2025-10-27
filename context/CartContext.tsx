@@ -39,48 +39,63 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [isCartLoaded, setIsCartLoaded] = useState(false);
   const [isLocalStorageAvailable, setIsLocalStorageAvailable] = useState(true);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // ✅ Mount detection for Vercel
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // ✅ SSR-safe localStorage loading
   useEffect(() => {
+    // Always set loaded to true on server
     if (typeof window === 'undefined') {
       setIsCartLoaded(true);
+      setHasInitialized(true);
       return;
     }
     
-    try {
-      // Test localStorage availability
-      const testKey = '__localStorage_test__';
-      localStorage.setItem(testKey, 'test');
-      localStorage.removeItem(testKey);
-      setIsLocalStorageAvailable(true);
-      
-      // Load cart from localStorage
-      const storedCart = localStorage.getItem("cart");
-      if (storedCart) {
-        try {
-          const parsedCart = JSON.parse(storedCart);
-          setCart(parsedCart);
-        } catch (error) {
-          console.error('Error parsing cart from localStorage:', error);
-          // Clear corrupted data
-          localStorage.removeItem("cart");
+    // Only run on client after mount
+    if (!mounted) return;
+    
+    // Client-side only
+    const loadCart = async () => {
+      try {
+        // Test localStorage availability
+        const testKey = '__localStorage_test__';
+        localStorage.setItem(testKey, 'test');
+        localStorage.removeItem(testKey);
+        setIsLocalStorageAvailable(true);
+        
+        // Load cart from localStorage
+        const storedCart = localStorage.getItem("cart");
+        if (storedCart) {
+          try {
+            const parsedCart = JSON.parse(storedCart);
+            setCart(parsedCart);
+          } catch (error) {
+            console.error('Error parsing cart from localStorage:', error);
+            // Clear corrupted data
+            localStorage.removeItem("cart");
+          }
         }
-      }
-    } catch (error) {
-      console.error("localStorage not available:", error);
-      setIsLocalStorageAvailable(false);
-      // Show toast notification for localStorage issues
-      if (typeof window !== 'undefined') {
-        // Import toast dynamically to avoid SSR issues
+      } catch (error) {
+        console.error("localStorage not available:", error);
+        setIsLocalStorageAvailable(false);
+        // Show toast notification for localStorage issues
         import('react-hot-toast').then(({ toast }) => {
           toast.error('Увага: кошик буде працювати тільки в цій сесії');
         });
+      } finally {
+        setIsCartLoaded(true);
+        setHasInitialized(true);
       }
-    } finally {
-      setIsCartLoaded(true);
-      setHasInitialized(true);
-    }
-  }, []);
+    };
+
+    // Use setTimeout to ensure this runs after hydration
+    const timeoutId = setTimeout(loadCart, 0);
+    return () => clearTimeout(timeoutId);
+  }, [mounted]);
 
   // ✅ Save to localStorage when cart changes (only if localStorage is available)
   useEffect(() => {

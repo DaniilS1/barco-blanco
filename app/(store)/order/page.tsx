@@ -152,7 +152,7 @@ const formSchema = z
   });
 
 
-export default function OrderForm() {
+function OrderForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedToggle, setSelectedToggle] = useState("");
   const { cart, getCartTotalPrice, clearCart, isCartLoaded } = useCart();
@@ -161,6 +161,7 @@ export default function OrderForm() {
   const [loadingWarehouses, setLoadingWarehouses] = useState(false);
   const [open, setOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
   const [isResetting, setIsResetting] = useState(false);
   const [deliveryMethodError, setDeliveryMethodError] = useState(false);
@@ -229,6 +230,20 @@ export default function OrderForm() {
     
     // Check for empty cart
     if (cart.length === 0) {
+      // Try to reload cart from localStorage as fallback
+      try {
+        const storedCart = localStorage.getItem("cart");
+        if (storedCart) {
+          const parsedCart = JSON.parse(storedCart);
+          if (parsedCart.length > 0) {
+            toast.error('Будь ласка, оновіть сторінку та спробуйте знову');
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Error checking localStorage fallback:', error);
+      }
+      
       toast.error('Додайте товари до кошика');
       return;
     }
@@ -364,6 +379,11 @@ export default function OrderForm() {
 
   useEffect(() => {
     setIsClient(true);
+    // Ensure hydration is complete
+    const timer = setTimeout(() => {
+      setIsHydrated(true);
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   // Auto-save form data to localStorage
@@ -855,9 +875,9 @@ export default function OrderForm() {
                 <Button
                   type="submit"
                   className="w-full bg-[#1996A3] hover:bg-[#167A8A] sm:w-auto text-white text-lg font-semibold py-3"
-                  disabled={isSubmitting || !isCartLoaded || cart.length === 0}
+                  disabled={isSubmitting || !isCartLoaded || !isHydrated || cart.length === 0}
                 >
-                  {!isCartLoaded ? (
+                  {!isCartLoaded || !isHydrated ? (
                     <div className="flex items-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin" />
                       Завантаження...
@@ -909,3 +929,5 @@ export default function OrderForm() {
 
   );
 }
+
+export default OrderForm;
