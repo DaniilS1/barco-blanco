@@ -182,7 +182,7 @@ export async function POST(request: Request) {
           </tr>
 
             <!-- Repeat this TR for each item -->
-            ${data.cart.map((item, index) => `
+            ${data.cart.map((item) => `
             <tr>
               <td style="padding:12px 0; border-top:1px solid #f1f1f1;">
                 <table cellpadding="0" cellspacing="0" role="presentation">
@@ -487,7 +487,7 @@ export async function POST(request: Request) {
             </tr>
 
             <!-- Repeat this TR for each item -->
-            ${data.cart.map((item, index) => `
+            ${data.cart.map((item) => `
             <tr>
               <td style="padding:12px 0; border-top:1px solid #f1f1f1;">
                 <table cellpadding="0" cellspacing="0" role="presentation">
