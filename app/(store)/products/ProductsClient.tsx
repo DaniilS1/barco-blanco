@@ -35,7 +35,7 @@ const categoryWidthFilters: { [key: string]: number[] } = {
 const categoryLabels: Record<string, string> = {
   dzerkala: "Дзеркала",
   tumby: "Тумби",
-  shafy: "Нависні шафи",
+  shafy: "Навісні шафи",
   vologostiike: "WATER",
   penaly: "Пенали",
 };

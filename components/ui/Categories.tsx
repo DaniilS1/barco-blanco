@@ -11,7 +11,7 @@ const categories: Cat[] = [
   { title: "Дзеркала", href: "/category/dzerkala", image: "/images/mirror.jpg" },
   { title: "Тумби", href: "/category/tumby", image: "/images/cabinet.jpeg" },
   { title: "Пенали", href: "/category/penaly", image: "/images/dresser.jpg" },
-  { title: "Нависні Шафи", href: "/category/shafy", image: "/images/wardrobe.jpeg" },
+  { title: "Навісні Шафи", href: "/category/shafy", image: "/images/wardrobe.jpeg" },
   { title: "Water", href: "/category/vologostiike", image: "/images/waterproof.jpeg" },
 ];
 
