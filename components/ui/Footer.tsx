@@ -5,11 +5,13 @@ import React from "react";
 import Image from "next/image";
 
 const Footer = () => {
+  const phoneRaw = "+380504730644";
+  const phoneDigits = phoneRaw.replace(/\D/g, ""); // 380504730644
+
   function handleAboutClick(e: React.MouseEvent) {
     e.preventDefault();
     if (typeof window === "undefined") return;
 
-    // Если мы уже на главной странице — плавно скроллим к секции с id="about"
     if (window.location.pathname === "/") {
       const el = document.getElementById("about");
       if (el) {
@@ -18,8 +20,37 @@ const Footer = () => {
       }
     }
 
-    // Иначе переходим на главную с хэшем — браузер/сервер загрузит нужную секцию
     window.location.href = `${window.location.origin}/#about`;
+  }
+
+  // Try open native app link, fallback to web link after timeout
+  function openDeepLink(appUrl: string, webUrl: string) {
+    try {
+      // try to open native app
+      window.location.href = appUrl;
+      // fallback to web after short delay
+      setTimeout(() => {
+        window.open(webUrl, "_blank");
+      }, 700);
+    } catch {
+      // best-effort fallback
+      window.open(webUrl, "_blank");
+    }
+  }
+
+  function openTelegram(e: React.MouseEvent) {
+    e.preventDefault();
+    // native and web fallbacks
+    const app = `tg://resolve?phone=${phoneDigits}`;
+    const web = `https://t.me/+${phoneDigits}`;
+    openDeepLink(app, web);
+  }
+
+  function openViber(e: React.MouseEvent) {
+    e.preventDefault();
+    const app = `viber://chat?number=%2B${phoneDigits}`;
+    const web = `https://viber.me/${phoneDigits}`;
+    openDeepLink(app, web);
   }
 
   return (
@@ -30,8 +61,8 @@ const Footer = () => {
           {/* Контакти */}
           <div className="flex flex-col items-center">
             <h3 className="text-xl font-semibold mb-2">Контакти</h3>
-            <a href="tel:+380504730644" className="hover:underline">
-              +38 (050) 47-30-644
+            <a href={`tel:${phoneRaw}`} className="hover:underline">
+              {phoneRaw}
             </a>
             <a href="mailto:avsdom@ukr.net" className="hover:underline">
               avsdom@ukr.net
@@ -41,7 +72,6 @@ const Footer = () => {
           {/* Інформація + (DESKTOP Icons) */}
           <div className="flex flex-col items-center text-center">
             <h3 className="text-xl font-semibold mb-2">Інформація</h3>
-            {/* Используем onClick чтобы гарантировать поведение скролла из любой страницы */}
             <Link href="/#about" onClick={handleAboutClick} className="hover:underline mb-1">
               Про нас
             </Link>
@@ -55,10 +85,10 @@ const Footer = () => {
             {/* Icons: show on desktop (md) and bigger only */}
             <div className="hidden md:flex justify-center gap-8 mt-4">
               <a
-                href="https://telegram.org"
-                target="_blank"
-                rel="noopener noreferrer"
+                href={`tg://resolve?phone=${phoneDigits}`}
+                onClick={openTelegram}
                 aria-label="Telegram"
+                rel="noopener noreferrer"
               >
                 <Image
                   src="/icons/telegram_icon.svg"
@@ -69,10 +99,10 @@ const Footer = () => {
                 />
               </a>
               <a
-                href="https://viber.com"
-                target="_blank"
-                rel="noopener noreferrer"
+                href={`viber://chat?number=%2B${phoneDigits}`}
+                onClick={openViber}
                 aria-label="Viber"
+                rel="noopener noreferrer"
               >
                 <Image
                   src="/icons/viber-footer.svg"
@@ -107,11 +137,12 @@ const Footer = () => {
 
             {/* Icons: show on mobile (below md) only */}
             <div className="flex md:hidden justify-center gap-8 mt-4">
+              
               <a
-                href="https://telegram.org"
-                target="_blank"
-                rel="noopener noreferrer"
+                href={`tg://resolve?phone=${phoneDigits}`}
+                onClick={openTelegram}
                 aria-label="Telegram"
+                rel="noopener noreferrer"
               >
                 <Image
                   src="/icons/telegram_icon.svg"
@@ -122,10 +153,10 @@ const Footer = () => {
                 />
               </a>
               <a
-                href="https://viber.com"
-                target="_blank"
-                rel="noopener noreferrer"
+                href={`viber://chat?number=%2B${phoneDigits}`}
+                onClick={openViber}
                 aria-label="Viber"
+                rel="noopener noreferrer"
               >
                 <Image
                   src="/icons/viber-footer.svg"
@@ -136,7 +167,7 @@ const Footer = () => {
                 />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/barco_blanco__?igsh=c2d4MXpuOW5rNG9t"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
