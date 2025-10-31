@@ -23,44 +23,51 @@ const Footer = () => {
     window.location.href = `${window.location.origin}/#about`;
   }
 
-  // Try open native app link, fallback to web link after timeout
-  function openDeepLink(appUrl: string, webUrl: string) {
+  // Try open native app link, fallback to web/tel link after timeout
+  function openDeepLink(appUrl: string, webUrl: string, fallbackUrl?: string) {
     try {
-      // try to open native app
+      // try open native app
       window.location.href = appUrl;
-      // fallback to web after short delay
+      // fallback after short delay
       setTimeout(() => {
-        window.open(webUrl, "_blank");
+        // prefer webUrl if provided, otherwise fallbackUrl (tel:) to avoid "account not found" page
+        if (webUrl) {
+          window.open(webUrl, "_blank");
+        } else if (fallbackUrl) {
+          window.open(fallbackUrl, "_blank");
+        }
       }, 700);
     } catch {
-      // best-effort fallback
-      window.open(webUrl, "_blank");
+      if (webUrl) window.open(webUrl, "_blank");
+      else if (fallbackUrl) window.open(fallbackUrl, "_blank");
     }
   }
 
   function openTelegram(e: React.MouseEvent) {
     e.preventDefault();
-    // native and web fallbacks
-    const app = `tg://resolve?phone=${phoneDigits}`;
-    const web = `https://t.me/+${phoneDigits}`;
-    openDeepLink(app, web);
+    const app = `tg://resolve?phone=%2B${phoneDigits}`; // native
+    const web = `https://t.me/+${phoneDigits}`;         // web fallback (may work in many cases)
+    openDeepLink(app, web, `tel:${phoneRaw}`);
   }
 
   function openViber(e: React.MouseEvent) {
     e.preventDefault();
-    const app = `viber://chat?number=%2B${phoneDigits}`;
-    const web = `https://viber.me/${phoneDigits}`;
-    openDeepLink(app, web);
+    // native deep link to open chat in Viber app
+    const app = `viber://chat?number=%2B${phoneDigits}`; 
+    // don't use viber.me as reliable fallback for starting chat by phone (often shows "account not exist")
+    // вместо этого открываем web.viber.com (потребует логин) или делаем fallback на звонок
+    const web = `https://web.viber.com/`;
+    openDeepLink(app, web, `tel:${phoneRaw}`);
   }
 
   return (
-    <footer className="bg-[#008c99] py-8 text-center text-white">
+    <footer className="bg-[#008c99] py-6 text-center text-white">
       <div className="max-w-[1000px] w-full mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between gap-8 text-white text-center md:text-center">
+        <div className="flex flex-col md:flex-row justify-between gap-6 text-white text-center md:text-left">
 
           {/* Контакти */}
-          <div className="flex flex-col items-center">
-            <h3 className="text-xl font-semibold mb-2">Контакти</h3>
+          <div className="flex flex-col items-center md:items-start">
+            <h3 className="text-lg font-semibold mb-1">Контакти</h3>
             <a href={`tel:${phoneRaw}`} className="hover:underline">
               {phoneRaw}
             </a>
@@ -71,7 +78,7 @@ const Footer = () => {
 
           {/* Інформація + (DESKTOP Icons) */}
           <div className="flex flex-col items-center text-center">
-            <h3 className="text-xl font-semibold mb-2">Інформація</h3>
+            <h3 className="text-lg font-semibold mb-1">Інформація</h3>
             <Link href="/#about" onClick={handleAboutClick} className="hover:underline mb-1">
               Про нас
             </Link>
@@ -83,9 +90,10 @@ const Footer = () => {
             </Link>
 
             {/* Icons: show on desktop (md) and bigger only */}
-            <div className="hidden md:flex justify-center gap-8 mt-4">
+            <div className="hidden md:flex justify-center gap-6 mt-2">
+              {/* href -> web fallback, onClick -> try native then fallback */}
               <a
-                href={`tg://resolve?phone=${phoneDigits}`}
+                href={`tg://resolve?phone=%2B${phoneDigits}`} // deep link for mobile
                 onClick={openTelegram}
                 aria-label="Telegram"
                 rel="noopener noreferrer"
@@ -99,7 +107,7 @@ const Footer = () => {
                 />
               </a>
               <a
-                href={`viber://chat?number=%2B${phoneDigits}`}
+                href={`viber://chat?number=%2B${phoneDigits}`} // deep link for mobile
                 onClick={openViber}
                 aria-label="Viber"
                 rel="noopener noreferrer"
@@ -113,7 +121,7 @@ const Footer = () => {
                 />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/barco_blanco__?igsh=c2d4MXpuOW5rNG9t"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
@@ -130,16 +138,15 @@ const Footer = () => {
           </div>
 
           {/* Ми працюємо + (MOBILE Icons) */}
-          <div className="flex flex-col items-center">
-            <h3 className="text-xl font-semibold mb-2">Ми працюємо</h3>
-            <p>Пн-Сб: з 9.00 до 18.00</p>
-            <p>Вихідний: Неділя</p>
+          <div className="flex flex-col items-center md:items-end">
+            <h3 className="text-lg font-semibold mb-1">Ми працюємо</h3>
+            <p className="text-sm">Пн-Сб: з 9.00 до 18.00</p>
+            <p className="text-sm">Вихідний: Неділя</p>
 
             {/* Icons: show on mobile (below md) only */}
-            <div className="flex md:hidden justify-center gap-8 mt-4">
-              
+            <div className="flex md:hidden justify-center gap-6 mt-2">
               <a
-                href={`tg://resolve?phone=${phoneDigits}`}
+                href={`tg://resolve?phone=%2B${phoneDigits}`}
                 onClick={openTelegram}
                 aria-label="Telegram"
                 rel="noopener noreferrer"
