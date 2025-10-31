@@ -29,6 +29,8 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({ images }) => {
     return null;
   }
 
+  const validImages = images.filter((image) => image?.asset);
+
   return (
     <div className="banner-container">
       <Swiper
@@ -39,17 +41,36 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({ images }) => {
         speed={1100}
         className="banner-swiper"
       >
-        {images.map((image) => (
-          <SwiperSlide key={image._key} className="banner-slide">
-            <Image
-              src={urlFor(image).url()}
-              alt={image.alt || "Banner Image"}
-              fill
-              className="banner-image"
-              priority
-            />
-          </SwiperSlide>
-        ))}
+        {validImages.map((image, index) => {
+          const builder = urlFor(image)
+            .width(1920)
+            .height(900)
+            .fit("crop")
+            .auto("format")
+            .quality(85);
+
+          const imageUrl = builder.url();
+          const isHeroSlide = index === 0;
+
+          if (!imageUrl) {
+            return null;
+          }
+
+          return (
+            <SwiperSlide key={image._key ?? imageUrl} className="banner-slide">
+              <Image
+                src={imageUrl}
+                alt={image.alt || "Головний банер Barco Blanco"}
+                fill
+                className="banner-image object-cover"
+                priority={isHeroSlide}
+                loading={isHeroSlide ? "eager" : "lazy"}
+                fetchPriority={isHeroSlide ? "high" : "low"}
+                sizes="(max-width: 768px) 100vw, 100vw"
+              />
+            </SwiperSlide>
+          );
+        })}
         {/* <div className="banner-button-wrapper">
           <Link href="/products">
             <button className="banner-button">ДО КАТАЛОГУ</button>

@@ -359,12 +359,12 @@ export default function ProductsClient({
                   paginatedProducts.map((product) => (
                     <div
                       key={product._id}
-                      className="w-full bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02] p-4 flex flex-col justify-between min-h-[450px]"
+                      className="w-full bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 p-4 flex flex-col justify-between min-h-[450px]"
                     >
                       <div>
                         <Product product={product} />
                       </div>
-                      <div className="mt-2 flex items-center justify-between">
+                      <div className="mt-2 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                           <span className="whitespace-nowrap text-lg sm:text-xl md:text-2xl font-normal text-[#1996A3]">
                             ₴{product.price}
