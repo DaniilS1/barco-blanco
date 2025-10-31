@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 
 const Footer = () => {
@@ -52,13 +52,70 @@ const Footer = () => {
 
   function openViber(e: React.MouseEvent) {
     e.preventDefault();
-    // native deep link to open chat in Viber app
-    const app = `viber://chat?number=%2B${phoneDigits}`; 
-    // don't use viber.me as reliable fallback for starting chat by phone (often shows "account not exist")
-    // вместо этого открываем web.viber.com (потребует логин) или делаем fallback на звонок
-    const web = `https://web.viber.com/`;
-    openDeepLink(app, web, `tel:${phoneRaw}`);
+
+    const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+    const isAndroid = /Android/i.test(ua);
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+    const telFallback = `tel:${phoneRaw}`;
+
+    // Android: try intent:// which reliably triggers installed app
+    if (isAndroid) {
+      const intentUrl = `intent://chat?number=%2B${phoneDigits}#Intent;package=com.viber.voip;scheme=viber;end`;
+      attemptOpenWithFallback(intentUrl, "https://web.viber.com/", telFallback);
+      return;
+    }
+
+    // iOS: try app scheme; use add/contact variation if chat doesn't open
+    if (isIOS) {
+      attemptOpenWithFallback(`viber://chat?number=%2B${phoneDigits}`, "https://web.viber.com/", telFallback);
+      return;
+    }
+
+    // Desktop / неизвестная платформа: открываем web.viber.com (пользователь должен залогиниться)
+    // и одновременно предлагается звонок как fallback
+    attemptOpenWithFallback("https://web.viber.com/", "https://web.viber.com/", telFallback);
   }
+
+  // --------- helper + fallback UI state ----------
+  const [viberFallbackVisible, setViberFallbackVisible] = useState(false);
+  const fallbackTimerRef = useRef<number | null>(null);
+
+  function attemptOpenWithFallback(openUrl: string, webUrl: string | null, telUrl?: string) {
+    // try to open (app or web)
+    try {
+      // For app schemes we set location, for web open in new tab
+      if (openUrl.startsWith("http")) window.open(openUrl, "_blank");
+      else window.location.href = openUrl;
+    } catch {
+      /* no-op */
+    }
+
+    // show fallback controls after short delay (if app didn't open)
+    if (fallbackTimerRef.current) window.clearTimeout(fallbackTimerRef.current);
+    // 800ms — если приложение откроется, пользователь уйдет и таймаут не успеет показать панель
+    fallbackTimerRef.current = window.setTimeout(() => {
+      setViberFallbackVisible(true);
+    }, 800);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (fallbackTimerRef.current) window.clearTimeout(fallbackTimerRef.current);
+    };
+  }, []);
+
+  function copyPhone() {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(phoneRaw);
+    }
+    setViberFallbackVisible(false);
+    alert("Номер скопійовано");
+  }
+
+  function callPhone() {
+    window.location.href = `tel:${phoneRaw}`;
+  }
+  // --------- end helper ----------
 
   return (
     <footer className="bg-[#008c99] py-6 text-center text-white">
@@ -124,8 +181,7 @@ const Footer = () => {
                 href="https://www.instagram.com/barco_blanco__?igsh=c2d4MXpuOW5rNG9t"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Instagram"
-              >
+                aria-label="Instagram"              >
                 <Image
                   src="/icons/instagram_icon.svg"
                   alt="Instagram"
@@ -191,6 +247,18 @@ const Footer = () => {
           </div>
         </div>
       </div>
+      {/* Viber fallback panel (показать если приложение не открылось) */}
+      {viberFallbackVisible && (
+        <div className="fixed right-4 bottom-4 z-50 bg-white text-black rounded-lg shadow-lg p-3 w-[260px]">
+          <div className="font-semibold mb-2">Відкрити Viber не вдалося</div>
+          <div className="text-sm mb-3">Ви можете:</div>
+          <div className="flex gap-2">
+            <button onClick={callPhone} className="flex-1 bg-[#008c99] text-white py-2 rounded">Подзвонити</button>
+            <button onClick={copyPhone} className="flex-1 border py-2 rounded">Скопіювати</button>
+          </div>
+          <div className="text-xs mt-2 text-gray-600">Або відкрийте Viber вручну на телефоні.</div>
+        </div>
+      )}
     </footer>
   );
 };
