@@ -354,12 +354,18 @@ export default function ProductsClient({
 
             {/* Список товаров */}
             <div className="flex-1">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+              {/* adaptive grid: cards auto-fit to available width;
+                  prevents a single stretched card on the last row on very wide screens */}
+              <div
+                className="grid gap-4 justify-items-center"
+                style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}
+              >
                 {paginatedProducts.length > 0 ? (
                   paginatedProducts.map((product) => (
                     <div
                       key={product._id}
-                      className="w-full bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02] p-4 flex flex-col justify-between min-h-[450px]"
+                      // limit card width so a single item in the last row stays centered
+                      className="w-full max-w-[320px] bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02] p-4 flex flex-col justify-between min-h-[420px]"
                     >
                       <div>
                         <Product product={product} />
