@@ -50,49 +50,44 @@ const Footer = () => {
     openDeepLink(app, web, `tel:${phoneRaw}`);
   }
 
+  // openViber missing -> add it back (uses attemptOpenAppOnly)
   function openViber(e: React.MouseEvent) {
     e.preventDefault();
-
     const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
     const isAndroid = /Android/i.test(ua);
     const isIOS = /iPhone|iPad|iPod/i.test(ua);
-    const telFallback = `tel:${phoneRaw}`;
 
-    // Android: try intent:// which reliably triggers installed app
     if (isAndroid) {
       const intentUrl = `intent://chat?number=%2B${phoneDigits}#Intent;package=com.viber.voip;scheme=viber;end`;
-      attemptOpenWithFallback(intentUrl, "https://web.viber.com/", telFallback);
+      attemptOpenAppOnly(intentUrl);
       return;
     }
 
-    // iOS: try app scheme; use add/contact variation if chat doesn't open
     if (isIOS) {
-      attemptOpenWithFallback(`viber://chat?number=%2B${phoneDigits}`, "https://web.viber.com/", telFallback);
+      const appUrl = `viber://chat?number=%2B${phoneDigits}`;
+      attemptOpenAppOnly(appUrl);
       return;
     }
 
-    // Desktop / неизвестная платформа: открываем web.viber.com (пользователь должен залогиниться)
-    // и одновременно предлагается звонок как fallback
-    attemptOpenWithFallback("https://web.viber.com/", "https://web.viber.com/", telFallback);
+    // Desktop/unknown: просто показать панель fallback (без web.viber)
+    setViberFallbackVisible(true);
   }
 
   // --------- helper + fallback UI state ----------
   const [viberFallbackVisible, setViberFallbackVisible] = useState(false);
   const fallbackTimerRef = useRef<number | null>(null);
 
-  function attemptOpenWithFallback(openUrl: string, webUrl: string | null, telUrl?: string) {
-    // try to open (app or web)
+  // пытаемся открыть ТОЛЬКО нативное приложение; если не открылось — показываем fallback UI
+  function attemptOpenAppOnly(openUrl: string, telUrl?: string) {
     try {
-      // For app schemes we set location, for web open in new tab
-      if (openUrl.startsWith("http")) window.open(openUrl, "_blank");
-      else window.location.href = openUrl;
+      // app schemes / intent: меняем location — это попытается открыть приложение
+      window.location.href = openUrl;
     } catch {
-      /* no-op */
+      /* ignore */
     }
 
-    // show fallback controls after short delay (if app didn't open)
+    // показать панель fallback, если через 800ms пользователь всё ещё на странице
     if (fallbackTimerRef.current) window.clearTimeout(fallbackTimerRef.current);
-    // 800ms — если приложение откроется, пользователь уйдет и таймаут не успеет показать панель
     fallbackTimerRef.current = window.setTimeout(() => {
       setViberFallbackVisible(true);
     }, 800);
