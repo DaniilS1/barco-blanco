@@ -45,6 +45,14 @@ export default function ProductsClient({
   selectedCategory,
 }: ProductsClientProps) {
   const [currentPage, setCurrentPage] = useState(1);
+
+  // при смене страницы плавно прокручиваем страницу вверх
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [currentPage]);
+
   const ITEMS_PER_PAGE = 16;
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -94,6 +102,8 @@ export default function ProductsClient({
   });
 
   const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+  // вычисляем количество страниц уже после filteredProducts определён
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
 
   const isActive = (category: string) =>
     selectedCategory?.toLowerCase() === category.toLowerCase();
@@ -471,18 +481,19 @@ export default function ProductsClient({
                   </div>
                 )}
               </div>
-              <div className="w-full mt-6 flex justify-center">
-                <Pagination
-                  totalPages={Math.ceil(
-                    filteredProducts.length / ITEMS_PER_PAGE
-                  )}
-                  currentPage={currentPage}
-                  onPageChange={(page) => {
-                    setCurrentPage(page);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                />
-              </div>
+              {/* Скрываем пагинацию если всего 1 страница */}
+              {totalPages > 1 && (
+                <div className="w-full mt-6 flex justify-center custom-pagination">
+                  <Pagination
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
