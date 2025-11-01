@@ -122,13 +122,19 @@ const Guarantee = () => {
                 1) Зберігайте чек або інший документ покупки. <br /> 2) Опишіть проблему (фото/відео допомагають). <br /> 3) Надішліть звернення — ми підкажемо подальші кроки.
               </Typography>
 
-              <Box sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap" }}>
+              <Box sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap", alignItems: "stretch" }}>
+                {/* buttons have equal width; stack on small screens */}
                 <Button
                   component="a"
                   href="tel:+380504730644"
                   variant="contained"
                   startIcon={<PhoneIcon />}
-                  sx={{ bgcolor: "#008c99", "&:hover": { bgcolor: "#007d87" } }}
+                  sx={{
+                    bgcolor: "#008c99",
+                    "&:hover": { bgcolor: "#007d87" },
+                    flex: 1,
+                    minWidth: { xs: "100%", sm: 200 },
+                  }}
                 >
                   +38 (050) 47-30-644
                 </Button>
@@ -138,7 +144,12 @@ const Guarantee = () => {
                   href="mailto:avsdom@ukr.net"
                   variant="outlined"
                   startIcon={<EmailIcon />}
-                  sx={{ borderColor: "#008c99", color: "#008c99" }}
+                  sx={{
+                    borderColor: "#008c99",
+                    color: "#008c99",
+                    flex: 1,
+                    minWidth: { xs: "100%", sm: 200 },
+                  }}
                 >
                   Написати на пошту
                 </Button>
