@@ -23,7 +23,7 @@ export function Pagination({ totalPages, currentPage, onPageChange }: Pagination
             ${
               currentPage === page
                 ? "bg-[#1996A3] text-white" 
-                : "bg-white text-[#1996A3] hover:bg-white hover:text-[#1996A3]"
+                : "bg-white text-[#1996A3] hover:bg-[#1996A3] hover:text-white"
             }
           `}
         >
