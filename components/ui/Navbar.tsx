@@ -429,6 +429,7 @@ const Navbar: FC = () => {
 
       {/* Main Navbar */}
       <AppBar
+        ref={mainBarRef}
         position="fixed"
         elevation={0}
         sx={{
@@ -437,12 +438,11 @@ const Navbar: FC = () => {
           pt: "10px",
           backdropFilter: "blur(12px)",
           zIndex: 1100,
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-          borderBottom: "1px solid rgba(0, 140, 153, 0.08)",
+          boxShadow: "0 0px 0px rgba(0, 0, 0, 0)",
+          borderBottom: "0px solid rgba(0, 140, 153, 0.08)",
         }}
       >
         <Toolbar
-          ref={mainBarRef}
           sx={{
             marginTop: "-10px",
             minHeight: 60,
@@ -683,6 +683,7 @@ const Navbar: FC = () => {
       <Box
         sx={{
           height: (isMobile ? 0 : topBarHeight) + mainBarHeight,
+          minHeight: isMobile ? '60px' : `${topBarHeight + 60}px`, // Add minimum height to prevent overlap
         }}
       />
 
