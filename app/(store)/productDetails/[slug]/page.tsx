@@ -62,6 +62,17 @@ interface ProductDetailsPayload {
   slug?: { current: string };
 }
 
+interface SimilarProductPayload {
+  _id: string;
+  name: string;
+  slug: { current: string };
+  price: number;
+  width?: number;
+  category?: string;
+  image?: ProductImageResult[];
+  isAvailable?: boolean;
+}
+
 function normalizeDescription(details?: string): string {
   if (!details) return siteConfig.shortDescription;
   const compact = details.replace(/\s+/g, " ").trim();
@@ -73,6 +84,20 @@ function selectPrimaryImage(images?: SanityImage[]): { url: string; alt: string 
   const [{ asset, alt }] = images;
   if (!asset?.url) return null;
   return { url: asset.url, alt: alt || siteConfig.name };
+}
+
+function normalizeProductImages(images?: SanityImage[]): ProductImageResult[] | null {
+  if (!images?.length) return null;
+
+  const normalized: ProductImageResult[] = [];
+
+  images.forEach((image) => {
+    const url = image.asset?.url;
+    if (!url) return;
+    normalized.push({ asset: { url }, alt: image.alt });
+  });
+
+  return normalized.length > 0 ? normalized : null;
 }
 
 function createProductJsonLd(product: ProductType, canonicalUrl: string, image?: { url: string; alt: string }) {
@@ -128,17 +153,11 @@ function createBreadcrumbJsonLd(product: ProductType, canonicalUrl: string) {
 }
 
 function mapToProductDetailsPayload(product: ProductType): ProductDetailsPayload {
-  const normalizedImages = product.image
-    ?.map((image) => {
-      const url = image.asset?.url;
-      if (!url) return null;
-      return { asset: { url }, alt: image.alt } as ProductImageResult;
-    })
-    .filter((image): image is ProductImageResult => Boolean(image));
+  const normalizedImages = normalizeProductImages(product.image);
 
   return {
     name: product.name,
-    image: normalizedImages && normalizedImages.length > 0 ? normalizedImages : null,
+    image: normalizedImages,
     price: product.price,
     details: product.details ?? siteConfig.shortDescription,
     category: product.category ?? "Каталог",
@@ -151,6 +170,21 @@ function mapToProductDetailsPayload(product: ProductType): ProductDetailsPayload
     reviewsCount: product.reviewsCount,
     isAvailable: product.isAvailable,
     slug: product.slug,
+  };
+}
+
+function mapToSimilarProductPayload(product: ProductType): SimilarProductPayload {
+  const normalizedImages = normalizeProductImages(product.image);
+
+  return {
+    _id: product._id,
+    name: product.name,
+    slug: product.slug,
+    price: product.price,
+    width: product.width,
+    category: product.category,
+    image: normalizedImages ?? undefined,
+    isAvailable: product.isAvailable,
   };
 }
 
@@ -278,7 +312,8 @@ export default async function Page({ params }: PageProps) {
     notFound();
   }
 
-  const similarProducts = await getSimilarProducts(product.category, product.slug?.current ?? slug);
+  const rawSimilarProducts = await getSimilarProducts(product.category, product.slug?.current ?? slug);
+  const similarProducts = rawSimilarProducts.map(mapToSimilarProductPayload);
   const canonicalUrl = getAbsoluteUrl(`/productDetails/${product.slug?.current ?? slug}`);
   const primaryImage = selectPrimaryImage(product.image);
   const productJsonLd = createProductJsonLd(product, canonicalUrl, primaryImage || undefined);

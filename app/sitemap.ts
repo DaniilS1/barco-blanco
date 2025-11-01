@@ -8,20 +8,26 @@ interface ProductSlugResult {
   _updatedAt?: string;
 }
 
-const STATIC_PATHS: Array<{ path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[0]["changeFrequency"] }> = [
-  { path: "/", priority: 1 },
-  { path: "/products", priority: 0.9 },
-  { path: "/category/dzerkala", priority: 0.8 },
-  { path: "/category/tumby", priority: 0.8 },
-  { path: "/category/penaly", priority: 0.8 },
-  { path: "/category/shafy", priority: 0.8 },
-  { path: "/category/vologostiike", priority: 0.8 },
-  { path: "/favorites", priority: 0.5 },
-  { path: "/basket", priority: 0.5 },
-  { path: "/order", priority: 0.5 },
-  { path: "/delivery", priority: 0.4 },
-  { path: "/guarantee", priority: 0.4 },
-  { path: "/contacts", priority: 0.4 },
+interface StaticPathConfig {
+  path: string;
+  priority: number;
+  changeFrequency?: MetadataRoute.Sitemap[0]["changeFrequency"];
+}
+
+const STATIC_PATHS: StaticPathConfig[] = [
+  { path: "/", priority: 1, changeFrequency: "daily" },
+  { path: "/products", priority: 0.9, changeFrequency: "daily" },
+  { path: "/category/dzerkala", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/category/tumby", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/category/penaly", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/category/shafy", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/category/vologostiike", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/favorites", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/basket", priority: 0.5, changeFrequency: "weekly" },
+  { path: "/order", priority: 0.5, changeFrequency: "weekly" },
+  { path: "/delivery", priority: 0.4, changeFrequency: "monthly" },
+  { path: "/guarantee", priority: 0.4, changeFrequency: "monthly" },
+  { path: "/contacts", priority: 0.4, changeFrequency: "monthly" },
 ];
 
 async function getProductSlugs(): Promise<ProductSlugResult[]> {
@@ -50,10 +56,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
-  const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map(({ path, priority }) => ({
+  const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map(({ path, priority, changeFrequency = "weekly" }) => ({
     url: getAbsoluteUrl(path),
     lastModified: now,
-    changeFrequency: "weekly",
+    changeFrequency,
     priority,
   }));
 
