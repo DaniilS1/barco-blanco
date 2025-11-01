@@ -117,6 +117,7 @@ export default function ProductsClient({
   };
 
   const [showCategories, setShowCategories] = useState(false);
+  const [tumbyInfoOpen, setTumbyInfoOpen] = useState(false);
 
   return (
     <>
@@ -308,6 +309,72 @@ export default function ProductsClient({
                     Тумба Water — це справжня{" "}
                     <span>яхта у вашій ванній кімнаті</span>!
                   </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Компактная подсказка для тумб — свернутая по умолчанию, раскрывается кнопкой */}
+          {selectedCategory === "tumby" && (
+            <div className="w-full mb-6">
+              <div className="max-w-[820px] mx-auto bg-white border border-[#E6F6F7] rounded-lg p-4 sm:p-5 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1">
+                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#E6F9FA] text-[#1996A3] font-bold">
+                      i
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-[#1996A3]">
+                          Розшифровка позначення тумб
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Приклад:{" "}
+                          <span className="font-medium">
+                            Тумба COMO 60 т-22 Альфа біла
+                          </span>
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setTumbyInfoOpen((s) => !s)}
+                        className="text-sm text-[#1996A3] underline ml-2"
+                      >
+                        {tumbyInfoOpen ? "Сховати" : "Детальніше"}
+                      </button>
+                    </div>
+
+                    {tumbyInfoOpen && (
+                      <div className="mt-3 text-sm text-gray-700">
+                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <li>
+                            <span className="font-semibold">COMO / Solas / інше</span>{" "}
+                            — назва умивальника
+                          </li>
+                          <li>
+                            <span className="font-semibold">60 / 50 / 70</span> — ширина
+                            умивальника (см)
+                          </li>
+                          <li>
+                            <span className="font-semibold">т-1 / т-22 / т-6</span> — тип
+                            фасаду (т — фасад, цифра — модель)
+                          </li>
+                          <li>
+                            <span className="font-semibold">Альфа / Оптіма / Омега</span>{" "}
+                            — тип ручки
+                          </li>
+                          <li>
+                            <span className="font-semibold">Біла / Сіра / Чорна</span> — колір
+                            тумби
+                          </li>
+                        </ul>
+                        <p className="mt-3 text-xs text-gray-500">
+                          Потрібна допомога з вибором? Зверніться до наших менеджерів.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

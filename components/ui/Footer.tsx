@@ -3,6 +3,7 @@
 import Link from "next/link";
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { createPortal } from "react-dom";
 
 const Footer = () => {
   const phoneRaw = "+380504730644";
@@ -43,59 +44,30 @@ const Footer = () => {
     }
   }
 
-  function openTelegram(e: React.MouseEvent) {
-    e.preventDefault();
-    const app = `tg://resolve?phone=%2B${phoneDigits}`; // native
-    const web = `https://t.me/+${phoneDigits}`;         // web fallback (may work in many cases)
-    openDeepLink(app, web, `tel:${phoneRaw}`);
-  }
-
-  // openViber missing -> add it back (uses attemptOpenAppOnly)
-  function openViber(e: React.MouseEvent) {
-    e.preventDefault();
-    const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
-    const isAndroid = /Android/i.test(ua);
-    const isIOS = /iPhone|iPad|iPod/i.test(ua);
-
-    if (isAndroid) {
-      const intentUrl = `intent://chat?number=%2B${phoneDigits}#Intent;package=com.viber.voip;scheme=viber;end`;
-      attemptOpenAppOnly(intentUrl);
-      return;
-    }
-
-    if (isIOS) {
-      const appUrl = `viber://chat?number=%2B${phoneDigits}`;
-      attemptOpenAppOnly(appUrl);
-      return;
-    }
-
-    // Desktop/unknown: просто показать панель fallback (без web.viber)
-    setViberFallbackVisible(true);
-  }
-
-  // --------- helper + fallback UI state ----------
+  // --------- Viber: try open app only; if not opened -> show local fallback panel (no web redirect) ----------
   const [viberFallbackVisible, setViberFallbackVisible] = useState(false);
-  const fallbackTimerRef = useRef<number | null>(null);
+  // безопасная типизация для таймера в браузере и в средах Node
+  const fallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // пытаемся открыть ТОЛЬКО нативное приложение; если не открылось — показываем fallback UI
-  function attemptOpenAppOnly(openUrl: string, telUrl?: string) {
+  function attemptOpenAppOnly(openUrl: string) {
+    console.log("[Viber] attemptOpenAppOnly, url:", openUrl);
     try {
-      // app schemes / intent: меняем location — это попытается открыть приложение
+      // try to open native app (intent / scheme)
       window.location.href = openUrl;
     } catch {
-      /* ignore */
+      // ignore
     }
 
-    // показать панель fallback, если через 800ms пользователь всё ещё на странице
-    if (fallbackTimerRef.current) window.clearTimeout(fallbackTimerRef.current);
-    fallbackTimerRef.current = window.setTimeout(() => {
+    // show local fallback panel if app didn't open (user stays on page)
+    if (fallbackTimerRef.current) clearTimeout(fallbackTimerRef.current);
+    fallbackTimerRef.current = setTimeout(() => {
       setViberFallbackVisible(true);
     }, 800);
   }
 
   useEffect(() => {
     return () => {
-      if (fallbackTimerRef.current) window.clearTimeout(fallbackTimerRef.current);
+      if (fallbackTimerRef.current) clearTimeout(fallbackTimerRef.current);
     };
   }, []);
 
@@ -110,7 +82,38 @@ const Footer = () => {
   function callPhone() {
     window.location.href = `tel:${phoneRaw}`;
   }
-  // --------- end helper ----------
+  // ---------------------------------------------------------------------------------------
+
+  function openTelegram(e: React.MouseEvent) {
+    e.preventDefault();
+    const app = `tg://resolve?phone=%2B${phoneDigits}`; // native
+    const web = `https://t.me/+${phoneDigits}`;         // web fallback (may work in many cases)
+    openDeepLink(app, web, `tel:${phoneRaw}`);
+  }
+
+  // openViber: try only native app (intent / scheme). Do NOT redirect to web.viber.com.
+  function openViber(e: React.MouseEvent) {
+    e.preventDefault();
+    const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+    const isAndroid = /Android/i.test(ua);
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+    console.log("[Viber] openViber called, isAndroid:", isAndroid, "isIOS:", isIOS);
+
+    if (isAndroid) {
+      const intentUrl = `intent://chat?number=%2B${phoneDigits}#Intent;package=com.viber.voip;scheme=viber;end`;
+      attemptOpenAppOnly(intentUrl);
+      return;
+    }
+
+    if (isIOS) {
+      const appUrl = `viber://chat?number=%2B${phoneDigits}`;
+      attemptOpenAppOnly(appUrl);
+      return;
+    }
+
+    // Desktop/unknown: показываем локальную панель с действиями (без перехода на web.viber)
+    setViberFallbackVisible(true);
+  }
 
   return (
     <footer className="bg-[#008c99] py-6 text-center text-white">
@@ -242,18 +245,42 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      {/* Viber fallback panel (показать если приложение не открылось) */}
-      {viberFallbackVisible && (
-        <div className="fixed right-4 bottom-4 z-50 bg-white text-black rounded-lg shadow-lg p-3 w-[260px]">
-          <div className="font-semibold mb-2">Відкрити Viber не вдалося</div>
-          <div className="text-sm mb-3">Ви можете:</div>
-          <div className="flex gap-2">
-            <button onClick={callPhone} className="flex-1 bg-[#008c99] text-white py-2 rounded">Подзвонити</button>
-            <button onClick={copyPhone} className="flex-1 border py-2 rounded">Скопіювати</button>
-          </div>
-          <div className="text-xs mt-2 text-gray-600">Або відкрийте Viber вручну на телефоні.</div>
-        </div>
-      )}
+      {/* Viber fallback panel (через portal в document.body чтобы избежать "улёта" из‑за предков) */}
+      {typeof document !== "undefined" &&
+        createPortal(
+          viberFallbackVisible ? (
+            <div
+              id="viber-panel"
+              className="bg-white text-black rounded-lg shadow-lg p-3 w-[260px] relative"
+              // inline style — жёстко ставим позиционирование и высокий z-index для отладки
+              style={{
+                position: "fixed",
+                right: "1rem",
+                left: "auto",
+                bottom: "1rem",
+                maxWidth: "260px",
+                zIndex: 2147483647,
+              }}
+            >
+               <button
+                 onClick={() => setViberFallbackVisible(false)}
+                 aria-label="Закрити"
+                 title="Закрити"
+                 className="absolute -top-3 -right-3 bg-white border rounded-full w-7 h-7 flex items-center justify-center shadow-sm hover:bg-gray-100"
+               >
+                 ×
+               </button>
+               <div className="font-semibold mb-2">Відкрити Viber не вдалося</div>
+               <div className="text-sm mb-3">Ви можете:</div>
+               <div className="flex gap-2">
+                 <button onClick={callPhone} className="flex-1 bg-[#008c99] text-white py-2 rounded">Подзвонити</button>
+                 <button onClick={copyPhone} className="flex-1 border py-2 rounded">Скопіювати</button>
+               </div>
+               <div className="text-xs mt-2 text-gray-600 whitespace-nowrap">Або відкрийте Viber вручну на телефоні.</div>
+             </div>
+           ) : null,
+           document.body
+         )}
     </footer>
   );
 };
