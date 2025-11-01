@@ -26,7 +26,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CloseIcon from "@mui/icons-material/Close";
 
+import { Heart } from "lucide-react";
+
 import { useCart } from "@/context/CartContext";
+import { useFavorites } from "@/context/favorites-context";
 import { useRouter } from "next/navigation";
 
 const SearchContainer = styled(Box)(({ theme }) => ({
@@ -106,12 +109,18 @@ const Navbar: FC = () => {
     { name: string; slug: string }[]
   >([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [topBarHeight, setTopBarHeight] = useState(0);
+  const [mainBarHeight, setMainBarHeight] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const topBarRef = useRef<HTMLDivElement | null>(null);
+  const mainBarRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const { getTotalItems } = useCart();
+  const { getTotalFavorites } = useFavorites();
+  const totalCartItems = getTotalItems();
+  const totalFavorites = getTotalFavorites();
 
   const isMobile = useMediaQuery("(max-width: 600px)");
   const isVeryNarrow = useMediaQuery("(max-width: 468px)");
@@ -130,15 +139,41 @@ const Navbar: FC = () => {
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.pageYOffset;
-      // Sanfterer Übergang mit einem größeren Bereich
-      setIsScrolled(scrollTop > 100);
+    const updateHeights = () => {
+      if (isMobile) {
+        setTopBarHeight(0);
+      } else {
+        setTopBarHeight(topBarRef.current?.offsetHeight ?? 0);
+      }
+
+      setMainBarHeight(mainBarRef.current?.offsetHeight ?? 0);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    updateHeights();
+
+    const observers: ResizeObserver[] = [];
+
+    if (typeof ResizeObserver !== "undefined") {
+      if (topBarRef.current) {
+        const observer = new ResizeObserver(updateHeights);
+        observer.observe(topBarRef.current);
+        observers.push(observer);
+      }
+
+      if (mainBarRef.current) {
+        const observer = new ResizeObserver(updateHeights);
+        observer.observe(mainBarRef.current);
+        observers.push(observer);
+      }
+    }
+
+    window.addEventListener("resize", updateHeights);
+
+    return () => {
+      window.removeEventListener("resize", updateHeights);
+      observers.forEach((observer) => observer.disconnect());
+    };
+  }, [isMobile]);
 
   useEffect(() => {
     // Prevent body scroll when mobile search modal is open
@@ -211,20 +246,18 @@ const Navbar: FC = () => {
       {/* Desktop Menu (hidden on mobile) */}
       {!isMobile && (
         <Box
+          ref={topBarRef}
           sx={{
             backgroundColor: "#008c99",
             display: "flex",
             justifyContent: "center",
-            padding: isScrolled ? "0.25rem 0" : "0.5rem 0",
-            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-            position: isScrolled ? "fixed" : "static",
-            top: isScrolled ? "0" : "auto",
-            left: "0",
-            right: "0",
-            zIndex: 1001,
-            opacity: isScrolled ? 0.95 : 1,
-            backdropFilter: isScrolled ? "blur(8px)" : "none",
-            boxShadow: isScrolled ? "0 2px 12px rgba(0, 0, 0, 0.1)" : "none",
+            padding: "0.5rem 0",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            width: "100%",
+            zIndex: 1200,
           }}
         >
           <Link href="/" passHref>
@@ -396,28 +429,23 @@ const Navbar: FC = () => {
 
       {/* Main Navbar */}
       <AppBar
-        position={isScrolled ? "fixed" : "static"}
+        position="fixed"
         elevation={0}
         sx={{
-          backgroundColor: isScrolled
-            ? "rgba(255, 255, 255, 0.95)"
-            : "transparent",
-          pt: isScrolled ? (!isMobile ? "40px" : "10px") : "10px",
-          backdropFilter: isScrolled ? "blur(12px)" : "none",
-          transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-          zIndex: 1000,
-          boxShadow: isScrolled
-            ? "0 4px 20px rgba(0, 0, 0, 0.08)"
-            : "none",
-          borderBottom: isScrolled
-            ? "1px solid rgba(0, 140, 153, 0.1)"
-            : "none",
+          top: isMobile ? 0 : topBarHeight,
+          backgroundColor: "#ffffff",
+          pt: "10px",
+          backdropFilter: "blur(12px)",
+          zIndex: 1100,
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+          borderBottom: "1px solid rgba(0, 140, 153, 0.08)",
         }}
       >
         <Toolbar
+          ref={mainBarRef}
           sx={{
             marginTop: "-10px",
-            minHeight: isScrolled ? 60 : 60,
+            minHeight: 60,
             maxWidth: "1400px",
             width: "100%",
             mx: "auto",
@@ -434,7 +462,7 @@ const Navbar: FC = () => {
               xs: 1,
               sm: 2,
             },
-            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+           
           }}
         >
           {/* Left Section: Menu Icon + Logo */}
@@ -554,6 +582,52 @@ const Navbar: FC = () => {
               </IconButton>
             )}
 
+            <Link href="/favorites">
+              <IconButton
+                disableRipple
+                sx={{
+                  color: "#008c99",
+                  "&:hover": {
+                    boxShadow: "none",
+                    backgroundColor: "transparent",
+                  },
+                }}
+              >
+                <Badge
+                  badgeContent={totalFavorites}
+                  sx={{
+                    mr: 0,
+                    "& .MuiBadge-badge": {
+                      backgroundColor: "#008c99",
+                      color: "#fff",
+                      fontSize: {
+                        xs: "0.75rem",
+                        sm: "0.85rem",
+                      },
+                      minWidth: {
+                        xs: 16,
+                        sm: 20,
+                      },
+                      height: {
+                        xs: 16,
+                        sm: 20,
+                      },
+                    },
+                  }}
+                >
+                  <Heart
+                    strokeWidth={1.8}
+                    style={{
+                      width: isMobile ? 22 : 26,
+                      height: isMobile ? 22 : 26,
+                    }}
+                    fill={totalFavorites > 0 ? "#008c99" : "none"}
+                    color="#008c99"
+                  />
+                </Badge>
+              </IconButton>
+            </Link>
+
             <Link href="/basket">
               <IconButton
                 disableRipple
@@ -566,7 +640,7 @@ const Navbar: FC = () => {
                 }}
               >
                 <Badge
-                  badgeContent={getTotalItems()}
+                  badgeContent={totalCartItems}
                   sx={{
                     mr: 2,
                     "& .MuiBadge-badge": {
@@ -605,6 +679,12 @@ const Navbar: FC = () => {
           </Box>
         </Toolbar>
       </AppBar>
+
+      <Box
+        sx={{
+          height: (isMobile ? 0 : topBarHeight) + mainBarHeight,
+        }}
+      />
 
       {/* Mobile Search Modal */}
       {mobileSearchOpen && (

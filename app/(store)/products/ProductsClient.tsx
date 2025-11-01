@@ -447,7 +447,7 @@ export default function ProductsClient({
                       <div>
                         <Product product={product} />
                       </div>
-                      <div className="mt-2 flex items-center justify-between">
+                      <div className="mt-2 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                           <span className="whitespace-nowrap text-lg sm:text-xl md:text-2xl font-normal text-[#1996A3]">
                             ₴{product.price}

@@ -42,15 +42,16 @@ function AboutSection() {
 
         {/* About Image */}
         <div className="about-image">
-          <Image
-            src="/images/about_section.jpeg"
-            alt="Про нас"
-            width={0}
-            height={0}
-            sizes="100vw"
-            style={{ width: "100%", height: "auto" }}
-            priority
-          />
+          <div className="relative w-full overflow-hidden rounded-3xl bg-slate-100 sm:aspect-[4/3]">
+            <Image
+              src="/images/about_section.jpeg"
+              alt="Команда Barco Blanco під час роботи над дизайном меблів"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 70vw, 560px"
+              loading="lazy"
+            />
+          </div>
         </div>
       </div>
     </section>

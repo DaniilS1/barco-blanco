@@ -8,6 +8,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { FavoriteButton } from "@/components/ui/favorite-button";
+import { FavoriteItem } from "@/context/favorites-context";
 import { useCart } from "@/context/CartContext";
 import Product from "./Product";
 
@@ -77,6 +79,15 @@ export default function ProductDetails({ productData, similarProducts = [], isLo
     Array.isArray(image) && image.length > 0
       ? image.filter(img => img?.asset?.url)
       : [{ asset: { url: "/images/placeholder.svg" }, alt: "placeholder" }];
+
+  const favoritePayload: FavoriteItem = {
+    id: productData.slug?.current || productData.article || name,
+    name,
+    price,
+    image: images[0]?.asset?.url || "/images/placeholder.svg",
+    slug: productData.slug?.current,
+    isAvailable,
+  };
 
   const handleAddToCart = () => {
     addToCart({
@@ -317,23 +328,32 @@ export default function ProductDetails({ productData, similarProducts = [], isLo
             </div>
           </div>
 
-          {/* Add to Cart */}
-          {isAvailable && (
-            <Button
-              onClick={handleAddToCart}
-              size="lg"
-              className="bg-[#1996A3] hover:bg-[#147a86] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold rounded-lg shadow-lg transition-all duration-200 hover:scale-105 w-full md:w-auto"
-            >
-              <Image
-                src="/icons/cart.png"
-                alt="Cart"
-                width={20}
-                height={20}
-                className="mr-2"
-              />
-              Додати в кошик
-            </Button>
-          )}
+          {/* Add to Cart & Favorites */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            {isAvailable && (
+              <Button
+                onClick={handleAddToCart}
+                size="lg"
+                className="bg-[#1996A3] hover:bg-[#147a86] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold rounded-lg shadow-lg transition-all duration-200 hover:scale-105 w-full sm:w-auto"
+              >
+                <Image
+                  src="/icons/cart.png"
+                  alt="Cart"
+                  width={20}
+                  height={20}
+                  className="mr-2"
+                />
+                Додати в кошик
+              </Button>
+            )}
+            <FavoriteButton
+              item={favoritePayload}
+              size="md"
+              showLabel
+              label="В улюблене"
+              className="w-full sm:w-auto"
+            />
+          </div>
 
           {/* Support Links */}
           <div className="flex items-center gap-3 text-sm text-gray-600">

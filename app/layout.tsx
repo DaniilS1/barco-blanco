@@ -1,45 +1,82 @@
 // app/layout.tsx
 import "./globals.css";
+import type { Metadata, Viewport } from "next";
 import { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 
-export const metadata = {
-  title: "Barcoblanco",
-  description: "Barcoblanco online store for bathroom furniture",
+import { getAbsoluteUrl, siteConfig } from "@/lib/site-config";
+
+const metadataBase = new URL(getAbsoluteUrl());
+
+export const metadata: Metadata = {
+  metadataBase,
+  title: {
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: siteConfig.keywords,
+  applicationName: siteConfig.name,
+  category: "e-commerce",
+  creator: siteConfig.name,
+  alternates: {
+    canonical: siteConfig.baseUrl,
+  },
+  openGraph: {
+    type: "website",
+    locale: siteConfig.locale,
+    siteName: siteConfig.name,
+    title: siteConfig.name,
+    description: siteConfig.shortDescription,
+    url: siteConfig.baseUrl,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.name,
+    description: siteConfig.shortDescription,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  other: {
+    "og:site_name": siteConfig.name,
+  },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  themeColor: "#008c99",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="uk" suppressHydrationWarning>
       <body>
         {children}
-        <Toaster 
+        <Toaster
           position="top-right"
           toastOptions={{
             duration: 4000,
             style: {
-              background: '#363636',
-              color: '#fff',
+              background: "#363636",
+              color: "#fff",
             },
             success: {
               duration: 3000,
               iconTheme: {
-                primary: '#4ade80',
-                secondary: '#fff',
+                primary: "#4ade80",
+                secondary: "#fff",
               },
             },
             error: {
               duration: 5000,
               iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff',
+                primary: "#ef4444",
+                secondary: "#fff",
               },
             },
           }}
