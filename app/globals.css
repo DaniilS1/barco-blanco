@@ -982,6 +982,24 @@ body {
   height: auto;
 }
 
+/* Mobile optimizations for BannerCarousel */
+@media (max-width: 768px) {
+  .banner-container {
+    aspect-ratio: 3 / 4 !important;
+    max-height: 400px !important;
+  }
+  
+  .banner-button-wrapper {
+    bottom: 1rem !important;
+  }
+  
+  .banner-button {
+    padding: 12px 20px !important;
+    font-size: 0.9rem !important;
+    min-width: 140px !important;
+  }
+}
+
 /* .banner-button-wrapper {
   position: absolute;
   left: 5%;
