@@ -32,9 +32,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({ images }) => {
   const validImages = images.filter((image) => image?.asset);
 
   return (
-    <div
-      className="banner-container mt-10 relative w-full overflow-hidden aspect-[16/7] max-h-[500px]"
-    >
+    <div className="banner-container relative w-full overflow-hidden aspect-[16/7] max-h-[500px]">
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         navigation={{
@@ -70,13 +68,12 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({ images }) => {
       >
         {validImages.map((image, index) => {
           const isHeroSlide = index === 0;
-          
+
           // Generate responsive, high-quality image URL from Sanity
-          // Next.js will handle responsive loading via sizes attribute
+          // Keep the original aspect ratio to avoid aggressive cropping
           const imageUrl = urlFor(image)
-            .width(1920) // High res for desktop
-            .height(840) // Maintains 16:7 aspect ratio
-            .fit("crop")
+            .width(1920) // Provide a large enough source for retina displays
+            .fit("max") // Respect original proportions while fitting within requested size
             .auto("format") // Auto WebP/AVIF when supported
             .quality(95) // High quality (85-100 range)
             .url();

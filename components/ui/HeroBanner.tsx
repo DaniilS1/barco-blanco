@@ -42,14 +42,12 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({ images }) => {
         className="banner-swiper"
       >
         {validImages.map((image, index) => {
-          const builder = urlFor(image)
+          const imageUrl = urlFor(image)
             .width(1920)
-            .height(900)
-            .fit("crop")
+            .fit("max")
             .auto("format")
-            .quality(85);
-
-          const imageUrl = builder.url();
+            .quality(95)
+            .url();
           const isHeroSlide = index === 0;
 
           if (!imageUrl) {
@@ -65,8 +63,8 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({ images }) => {
                 className="banner-image object-cover"
                 priority={isHeroSlide}
                 loading={isHeroSlide ? "eager" : "lazy"}
-                fetchPriority={isHeroSlide ? "high" : "low"}
-                sizes="(max-width: 768px) 100vw, 100vw"
+                fetchPriority={isHeroSlide ? "high" : "auto"}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
               />
             </SwiperSlide>
           );
