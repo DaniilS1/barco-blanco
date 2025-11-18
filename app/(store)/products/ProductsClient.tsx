@@ -371,7 +371,7 @@ export default function ProductsClient({
                             фасаду (т — фасад, цифра — модель)
                           </li>
                           <li>
-                            <span className="font-semibold">Альфа / Оптіма / Омега</span>{" "}
+                            <span className="font-semibold">Альфа / Optima / Омега</span>{" "}
                             — тип ручки
                           </li>
                           <li>
