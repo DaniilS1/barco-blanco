@@ -21,3 +21,21 @@ export const productQuery = `
     isAvailable,
   }
 `;
+
+/** Projection for product feed (slug as string, full image refs for urlFor). */
+export const productFeedQuery = `
+  *[_type == "product" && !(_id in path("drafts.**"))] {
+    _id,
+    name,
+    "slug": slug.current,
+    price,
+    details,
+    category,
+    width,
+    height,
+    depth,
+    isPopular,
+    image,
+    isAvailable,
+  }
+`;
