@@ -11,8 +11,8 @@ export async function GET(request: Request) {
   const num = Number(query);
   const isNumeric = !isNaN(num);
   const groqQuery = isNumeric
-    ? `*[_type == "product" && (width >= ${num - 10} && width <= ${num + 10})][0...5]{ name, "slug": slug.current, width }`
-    : `*[_type == "product" && name match "${query}*"][0...5]{ name, "slug": slug.current }`;
+    ? `*[_type == "product" && (width >= ${num} && width <= ${num})][0...10]{ name, "slug": slug.current, width }`
+    : `*[_type == "product" && name match "${query}*"][0...10]{ name, "slug": slug.current }`;
   try {
     const results = await client.fetch(groqQuery);
     return NextResponse.json(results);
