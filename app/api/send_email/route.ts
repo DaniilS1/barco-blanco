@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { resolveMx } from "dns/promises";
 
 // Gmail as primary email service
 const GMAIL_USERNAME = "barcoblancoshop@gmail.com";
@@ -32,6 +33,8 @@ interface OrderData {
     deliveryMethod: DeliveryMethod;
     pickup?: string;
     pickupDeatails?: string;
+    honeypot?: string;
+    pageLoadTimeMs?: number;
 }
 
 async function sendEmail(toEmail: string, subject: string, htmlBody: string): Promise<void> {
@@ -85,6 +88,36 @@ export async function POST(request: Request) {
         
         if (!data.deliveryMethod) {
             return NextResponse.json({ error: "Missing delivery method" }, { status: 400 });
+        }
+
+        // Honeypot: bots fill hidden fields, real users don't
+        if (data.honeypot) {
+            return NextResponse.json({ message: "Замовлення оброблено, електронні листи надіслано" }, { status: 200 });
+        }
+
+        // Timestamp: reject submissions faster than 3 seconds (scripted bots)
+        if (typeof data.pageLoadTimeMs === "number" && data.pageLoadTimeMs < 3000) {
+            return NextResponse.json(
+                { error: "Будь ласка, перевірте дані та спробуйте ще раз." },
+                { status: 400 }
+            );
+        }
+
+        // MX validation: reject emails with no valid mail server
+        const emailDomain = data.email.split("@")[1];
+        try {
+            const mxRecords = await resolveMx(emailDomain);
+            if (!mxRecords || mxRecords.length === 0) {
+                return NextResponse.json(
+                    { error: "Введена електронна адреса недійсна. Перевірте правильність пошти." },
+                    { status: 400 }
+                );
+            }
+        } catch {
+            return NextResponse.json(
+                { error: "Введена електронна адреса недійсна. Перевірте правильність пошти." },
+                { status: 400 }
+            );
         }
 
         const totalAmount = data.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Select from "react-select";
@@ -75,6 +75,10 @@ type OrderFormData = {
   pickup?: string;
   pickupDeatails?: string;                       // Nur wenn pickup gewählt wird
 
+  // Bot protection
+  honeypot?: string;
+  pageLoadTimeMs?: number;
+
   // Warenkorb
   cart: CartItem[];
 };
@@ -109,6 +113,7 @@ const formSchema = z
     deliveryMethod: z.enum(["nova-poshta", "pickup"], {
       required_error: "Оберіть спосіб доставки.",
     }),
+    honeypot: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.deliveryMethod === "pickup") {
@@ -153,6 +158,7 @@ const formSchema = z
 
 
 function OrderForm() {
+  const pageLoadTime = useRef(Date.now());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedToggle, setSelectedToggle] = useState("");
   const { cart, getCartTotalPrice, clearCart, isCartLoaded } = useCart();
@@ -191,6 +197,7 @@ function OrderForm() {
       pickup: "",
       deliveryMethod: undefined,
       pickupDeatails: "",
+      honeypot: "",
     },
   });
 
@@ -273,6 +280,7 @@ function OrderForm() {
       addressCourier: undefined,
       pickup: undefined,
       selectedToggle: selectedToggle,
+      pageLoadTimeMs: Date.now() - pageLoadTime.current,
       cart: cart?.map((item) => ({
         id: item.id,
         name: item.name,
@@ -353,7 +361,9 @@ function OrderForm() {
         pickup: "",
         deliveryMethod: undefined,
         pickupDeatails: "",
+        honeypot: "",
       });
+      pageLoadTime.current = Date.now();
       setSelectedCity(undefined);
       setWarehouses([]);
       setSelectedToggle("");
@@ -413,6 +423,17 @@ function OrderForm() {
   return (
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        {/* Honeypot: hidden from real users, bots fill it automatically */}
+        <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', opacity: 0, height: 0, overflow: 'hidden' }} aria-hidden="true">
+          <label htmlFor="website">Website</label>
+          <input
+            id="website"
+            type="text"
+            {...form.register("honeypot")}
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
         <div className="grid gap-5 sm:grid-cols-1 md:grid-cols-2 pt-6 pb-8 text-lg max-w-7xl mx-auto mt-0 px-0 overflow-hidden">
           {/* left column (формы) */}
           <Card className="border-none shadow-none outline-none ring-0 p-0 gap-0 max-w-full overflow-hidden">
