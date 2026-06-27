@@ -304,10 +304,10 @@ function OrderForm() {
 
 
     try {
-      const response = await fetch("/api/send_email", {
+      const response = await fetch("/api/order", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(cleanedOrder),
       });
