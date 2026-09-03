@@ -1,13 +1,13 @@
 # Product Feed API
 
-XML-Feed aller Produkte aus Sanity unter `GET /api/feed.xml`. Geeignet für Preisvergleiche, Marktplätze oder den direkten Download.
+XML-Feed aller Produkte aus Sanity unter `GET /api/feed.xml` im Format **`yml_catalog`** (YML / „shops.dtd" – Standard für ukrainische Marktplätze & Preisvergleiche).
 
 ## Endpunkt
 
 | | |
 |---|---|
 | **URL** | `GET /api/feed.xml` |
-| **Response** | `application/xml` |
+| **Response** | `application/xml; charset=utf-8` |
 
 ## Query-Parameter
 
@@ -17,49 +17,82 @@ XML-Feed aller Produkte aus Sanity unter `GET /api/feed.xml`. Geeignet für Prei
 
 **Beispiele:**
 
-- Im Browser anzeigen: `https://deine-domain.de/api/feed.xml`
-- Als Datei herunterladen: `https://deine-domain.de/api/feed.xml?download=1`
+- Im Browser anzeigen: `https://barco-blanco.ua/api/feed.xml`
+- Als Datei herunterladen: `https://barco-blanco.ua/api/feed.xml?download=1`
 
 ## XML-Struktur
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<feed>
-  <products>
-    <product>
-      <name>Produktname</name>
-      <url>https://.../productDetails/slug</url>
-      <price>123.45</price>
-      <category>dzerkala</category>
-      <availability>in stock</availability>
-      <description>Beschreibungstext</description>
-      <width>80</width>
-      <height>120</height>
-      <depth>45</depth>
-      <isPopular>true</isPopular>
-      <image>https://cdn.sanity.io/.../800x...</image>
-      <images><url>...</url><url>...</url></images>
-    </product>
-  </products>
-</feed>
+<?xml version="1.0" encoding="utf-8"?>
+<yml_catalog date="2026-09-04 10:00">
+  <shop>
+    <name>Barco Blanco</name>
+    <company>Barco Blanco</company>
+    <url>https://barco-blanco.ua</url>
+    <currencies>
+      <currency id="UAH" rate="1"/>
+    </currencies>
+    <categories>
+      <category id="1">Дзеркала</category>
+      <!-- ... -->
+    </categories>
+    <offers>
+      <offer id="{sanity _id}" available="true">
+        <url>https://barco-blanco.ua/productDetails/{slug}</url>
+        <price>2499.90</price>
+        <currencyId>UAH</currencyId>
+        <categoryId>1</categoryId>
+        <picture>https://cdn.sanity.io/.../a.jpg</picture>
+        <picture>https://cdn.sanity.io/.../b.jpg</picture>
+        <vendor>Barco Blanco</vendor>
+        <stock_quantity>1</stock_quantity>
+        <name>Produktname</name>
+        <description><![CDATA[Beschreibung/Details]]></description>
+        <vendorCode>{slug}</vendorCode>
+        <param name="Ширина (см)">80</param>
+        <param name="Висота (см)">120</param>
+        <param name="Глибина (см)">45</param>
+      </offer>
+    </offers>
+  </shop>
+</yml_catalog>
 ```
 
-## Felder pro Produkt
+## Feld-Mapping (Sanity → Feed)
 
-| Element | Inhalt |
-|---------|--------|
-| `name` | Produktname |
-| `url` | Absolute URL zur Produktseite (`/productDetails/{slug}`) |
-| `price` | Preis (Zahl, 2 Nachkommastellen) |
-| `category` | Kategorie-Slug (z. B. `dzerkala`, `shafy`, `tumby`) |
-| `availability` | `in stock` oder `out of stock` |
-| `description` | Beschreibung/Details (kann leer sein) |
-| `width` | Breite in cm |
-| `height` | Höhe in cm |
-| `depth` | Tiefe in cm |
-| `isPopular` | `true` oder `false` |
-| `image` | URL des ersten Bildes (800px Breite) |
-| `images` | Alle Bild-URLs als `<url>`-Elemente |
+| Feed-Element | Quelle | Anmerkung |
+|---|---|---|
+| `offer@id` | `_id` | Sanity-Dokument-ID |
+| `offer@available` | `isAvailable` | `true` / `false` |
+| `url` | `slug` | `{Basis-URL}/productDetails/{slug}` |
+| `price` | `price` | 2 Nachkommastellen |
+| `currencyId` | fest | `UAH` |
+| `categoryId` | `category` | feste ID-Zuordnung, siehe unten |
+| `picture` | `image[].asset.url` | alle Bilder, ohne Resize |
+| `vendor` | fest | `Barco Blanco` (kein Markenfeld im Schema) |
+| `stock_quantity` | `isAvailable` | abgeleitet: `true` → `1`, `false` → `0` (keine echte Lagerzahl) |
+| `name` | `name` | |
+| `description` | `details` | als CDATA |
+| `vendorCode` | `slug` | Platzhalter, solange es kein SKU-Feld gibt |
+| `param` | `width` / `height` / `depth` | nur Maße (cm), nur wenn > 0 |
+
+### Kategorie-IDs
+
+Feste Zuordnung in `route.ts` (`CATEGORY_MAP`). Nur tatsächlich verwendete Kategorien landen in `<categories>`.
+
+| Slug | ID | Titel |
+|---|---|---|
+| `dzerkala` | 1 | Дзеркала |
+| `shafy` | 2 | Шафи |
+| `tumby` | 3 | Тумби |
+| `vologostiike` | 4 | Вологостійке |
+| `penaly` | 5 | Пенали |
+
+## Offene Punkte / spätere Erweiterungen
+
+- **`vendorCode`** – aktuell `slug`. Sobald es echte Artikelnummern gibt: SKU-Feld in Sanity ergänzen und hier mappen.
+- **`stock_quantity`** – aktuell nur 0/1 aus dem Boolean. Für echte Bestände ein Zahlenfeld `stock` im Schema ergänzen.
+- **`param`** – aktuell nur Abmessungen. Weitere Attribute (Material, Farbe, Montageart …) existieren im Schema noch nicht.
 
 ## Caching
 
@@ -70,9 +103,9 @@ Daten kommen aus Sanity (GROQ); Entwürfe werden nicht einbezogen.
 
 ## Basis-URL für Links
 
-Produkt- und Bild-URLs nutzen (in dieser Reihenfolge):
+Produkt-URLs nutzen (in dieser Reihenfolge):
 
-1. `NEXT_PUBLIC_SITE_URL` (z. B. `https://shop.example.com`)
+1. `NEXT_PUBLIC_SITE_URL` (z. B. `https://barco-blanco.ua`)
 2. `https://${VERCEL_URL}` (auf Vercel gesetzt)
 3. Origin der Anfrage
 4. Fallback: `NEXT_PUBLIC_APP_URL`, dann `http://localhost:3000`
