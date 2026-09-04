@@ -105,12 +105,12 @@ Daten kommen aus Sanity (GROQ); Entwürfe werden nicht einbezogen.
 
 Produkt-URLs nutzen (in dieser Reihenfolge):
 
-1. `NEXT_PUBLIC_SITE_URL` (z. B. `https://barco-blanco.ua`)
+1. `NEXT_PUBLIC_BASE_URL` (z. B. `https://barco-blanco.ua`)
 2. `https://${VERCEL_URL}` (auf Vercel gesetzt)
 3. Origin der Anfrage
 4. Fallback: `NEXT_PUBLIC_APP_URL`, dann `http://localhost:3000`
 
-Für stabile Links in Produktion `NEXT_PUBLIC_SITE_URL` in der Umgebung setzen.
+Für stabile Links in Produktion `NEXT_PUBLIC_BASE_URL` in der Umgebung setzen.
 
 ## Fehler
 

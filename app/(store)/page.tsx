@@ -1,6 +1,7 @@
 // app/(store)/page.tsx
 
 import React from "react";
+import type { Metadata } from "next";
 
 import {
   AboutSection,
@@ -12,6 +13,21 @@ import CallButton from "../../components/ui/CallButton";
 import BannerCarousel from "../../components/ui/HeroBanner";
 import { client } from "../../sanity/lib/client";
 import { bannerQuery, productQuery } from "../../sanity/lib/queries";
+import { getAbsoluteUrl, siteConfig } from "@/lib/site-config";
+
+export const metadata: Metadata = {
+  title: {
+    absolute:
+      "Barco Blanco — меблі для ванної кімнати, дзеркала та тумби з доставкою по Україні",
+  },
+  description: siteConfig.description,
+  alternates: {
+    canonical: getAbsoluteUrl("/"),
+  },
+  openGraph: {
+    url: getAbsoluteUrl("/"),
+  },
+};
 
 const Home = async () => {
   try {
@@ -22,6 +38,11 @@ const Home = async () => {
 
     return (
       <>
+        <h1 className="sr-only">
+          Barco Blanco — меблі для ванної кімнати: дзеркала, тумби, пенали та навісні
+          шафи з доставкою по Україні
+        </h1>
+
         {bannerData?.[0]?.images?.length > 0 && (
           <BannerCarousel images={bannerData[0].images} />
         )}

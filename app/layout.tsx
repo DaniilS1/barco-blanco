@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   applicationName: siteConfig.name,
   category: "e-commerce",
   creator: siteConfig.name,
-  alternates: {
-    canonical: siteConfig.baseUrl,
-  },
+  // Kein globales `alternates.canonical` hier: Next.js vererbt es sonst an
+  // JEDE Unterseite, wodurch /products, /category/* usw. auf die Startseite
+  // kanonisiert und aus dem Index gedrängt würden. Canonical wird pro Seite gesetzt.
   openGraph: {
     type: "website",
     locale: siteConfig.locale,

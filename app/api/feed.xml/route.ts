@@ -38,7 +38,7 @@ const CATEGORY_MAP: Record<string, { id: number; title: string }> = {
 };
 
 function getBaseUrl(request: Request): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const siteUrl = process.env.NEXT_PUBLIC_BASE_URL;
   if (siteUrl?.trim()) {
     const trimmed = siteUrl.trim();
     const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
